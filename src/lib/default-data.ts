@@ -3,6 +3,7 @@ import type {
   PortfolioProject,
   SkillCategory,
   PortfolioExperience,
+  PortfolioOtherExperience,
   PortfolioActivity,
   PortfolioResearch,
 } from "@/types/portfolio";
