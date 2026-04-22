@@ -82,12 +82,18 @@ export async function POST(request: Request) {
       url: uploadedAsset.secure_url,
       publicId: uploadedAsset.public_id,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Upload error:", error);
+    
+    // Trích xuất thông báo lỗi sâu nhất có thể
+    const errorMessage = error.message || 
+                         (error.error && error.error.message) || 
+                         (typeof error === 'string' ? error : JSON.stringify(error));
+
     return NextResponse.json(
       { 
-        message: "Lỗi upload: " + (error instanceof Error ? error.message : "Không xác định"),
-        error: error
+        message: "Lỗi upload chi tiết: " + errorMessage,
+        debug: error
       },
       { status: 500 },
     );
