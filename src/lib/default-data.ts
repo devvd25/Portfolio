@@ -76,6 +76,7 @@ export const defaultProjectsSeed: Array<Omit<PortfolioProject, "id">> = [
     repoUrl: "https://github.com",
     featured: true,
     order: 2,
+    isHidden: false,
   },
   {
     title: {
@@ -93,6 +94,7 @@ export const defaultProjectsSeed: Array<Omit<PortfolioProject, "id">> = [
     repoUrl: "https://github.com",
     featured: false,
     order: 3,
+    isHidden: false,
   },
 ];
 
