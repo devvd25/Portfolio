@@ -1,7 +1,7 @@
 import { ActivityModel } from "@/models/Activity";
 import { ExperienceModel } from "@/models/Experience";
 import { OtherExperienceModel } from "@/models/OtherExperience";
-import { PortfolioProfileModel } from "@/models/Profile";
+import { PortfolioProfileModel } from "@/models/PortfolioProfile";
 import { ProjectModel } from "@/models/Project";
 import { ResearchModel } from "@/models/Research";
 import type { 
