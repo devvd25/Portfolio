@@ -56,9 +56,12 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!file.type.startsWith("image/")) {
+    const isImage = file.type.startsWith("image/");
+    const isPdf = file.type === "application/pdf";
+
+    if (!isImage && !isPdf) {
       return NextResponse.json(
-        { message: "Chi cho phep upload file hinh anh." },
+        { message: "Chỉ cho phép upload hình ảnh hoặc file PDF." },
         { status: 400 },
       );
     }
@@ -71,7 +74,7 @@ export async function POST(request: Request) {
 
     const uploadedAsset = await cloudinary.uploader.upload(dataUri, {
       folder: process.env.CLOUDINARY_FOLDER ?? "portfolio-app",
-      resource_type: "image",
+      resource_type: "auto",
       overwrite: true,
     });
 

@@ -350,6 +350,46 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
     }
   }
 
+  async function handleProfileFileUpload(file: File, field: "avatarUrl" | "cvUrl") {
+    setIsUploading(true);
+    setNotice(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const payload = (await response.json()) as { message?: string };
+        throw new Error(payload.message ?? t("admin.notice.uploadFailed"));
+      }
+
+      const result = (await response.json()) as { url: string };
+
+      setProfile((prev) => ({
+        ...prev,
+        [field]: result.url,
+      }));
+
+      setNotice({
+        type: "success",
+        message: t("admin.notice.uploaded"),
+      });
+    } catch (error) {
+      setNotice({
+        type: "error",
+        message:
+          error instanceof Error ? error.message : t("admin.notice.uploadError"),
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  }
+
   async function handleLogout() {
     await fetch("/api/auth/logout", {
       method: "POST",
@@ -790,23 +830,53 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label={t("admin.profile.field.avatar")}>
-                <Input
-                  value={profile.avatarUrl}
-                  onChange={(event) =>
-                    setProfile((prev) => ({ ...prev, avatarUrl: event.target.value }))
-                  }
-                />
-              </Field>
+              <div className="space-y-2">
+                <Field label={t("admin.profile.field.avatar")}>
+                  <Input
+                    value={profile.avatarUrl}
+                    onChange={(event) =>
+                      setProfile((prev) => ({ ...prev, avatarUrl: event.target.value }))
+                    }
+                  />
+                </Field>
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-zinc-200 bg-white/70 px-3 py-1.5 text-xs font-medium text-zinc-700 dark:border-zinc-700 dark:bg-zinc-900/70 dark:text-zinc-200">
+                  <UploadCloud className="h-3.5 w-3.5 text-sky-500" />
+                  {isUploading ? "Uploading..." : "Upload Avatar"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) void handleProfileFileUpload(file, "avatarUrl");
+                    }}
+                  />
+                </label>
+              </div>
 
-              <Field label={t("admin.profile.field.cv")}>
-                <Input
-                  value={profile.cvUrl}
-                  onChange={(event) =>
-                    setProfile((prev) => ({ ...prev, cvUrl: event.target.value }))
-                  }
-                />
-              </Field>
+              <div className="space-y-2">
+                <Field label={t("admin.profile.field.cv")}>
+                  <Input
+                    value={profile.cvUrl}
+                    onChange={(event) =>
+                      setProfile((prev) => ({ ...prev, cvUrl: event.target.value }))
+                    }
+                  />
+                </Field>
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-zinc-200 bg-white/70 px-3 py-1.5 text-xs font-medium text-zinc-700 dark:border-zinc-700 dark:bg-zinc-900/70 dark:text-zinc-200">
+                  <UploadCloud className="h-3.5 w-3.5 text-sky-500" />
+                  {isUploading ? "Uploading..." : "Upload CV (PDF/Image)"}
+                  <input
+                    type="file"
+                    accept="image/*,application/pdf"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) void handleProfileFileUpload(file, "cvUrl");
+                    }}
+                  />
+                </label>
+              </div>
             </div>
 
             <Button type="submit" disabled={isSaving} className="w-full sm:w-auto">
