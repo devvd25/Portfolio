@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { PortfolioResearch, LocalizedString } from "@/types/portfolio";
 
-export function AdminResearchTab() {
+export function AdminResearchTab({ isAutoSaveEnabled = false }: { isAutoSaveEnabled?: boolean }) {
   const { t, language } = useLanguage();
   const [data, setData] = useState<PortfolioResearch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -55,19 +55,12 @@ export function AdminResearchTab() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setIsSaving(true);
-    setNotice(null);
-
     const viAch = form.achievementsTextVI.split("\n").map(t => t.trim()).filter(Boolean);
     const enAch = form.achievementsTextEN.split("\n").map(t => t.trim()).filter(Boolean);
     const maxAch = Math.max(viAch.length, enAch.length);
-    
     const achievements: LocalizedString[] = [];
     for (let i = 0; i < maxAch; i++) {
-      achievements.push({
-        vi: viAch[i] || "",
-        en: enAch[i] || ""
-      });
+      achievements.push({ vi: viAch[i] || "", en: enAch[i] || "" });
     }
 
     const payload = {
@@ -82,9 +75,16 @@ export function AdminResearchTab() {
       order: Number(form.order),
     };
 
+    await saveData(editingId, payload);
+  }
+
+  async function saveData(id: string | null, payload: any, silent = false) {
+    if (!silent) setIsSaving(true);
+    if (!silent) setNotice(null);
+
     try {
-      const endpoint = editingId ? `/api/research/${editingId}` : "/api/research";
-      const method = editingId ? "PATCH" : "POST";
+      const endpoint = id ? `/api/research/${id}` : "/api/research";
+      const method = id ? "PATCH" : "POST";
       const res = await fetch(endpoint, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -93,16 +93,50 @@ export function AdminResearchTab() {
 
       if (!res.ok) throw new Error("Save failed");
 
-      setNotice({ type: "success", message: t("admin.common.saveSuccess") });
-      setEditingId(null);
-      setForm({ ...emptyForm, order: data.length + 1 });
-      await loadData();
+      if (!silent) {
+        setNotice({ type: "success", message: t("admin.common.saveSuccess") });
+        setEditingId(null);
+        setForm({ ...emptyForm, order: data.length + 1 });
+        await loadData();
+      }
     } catch {
-      setNotice({ type: "error", message: t("admin.common.saveFailed") });
+      if (!silent) {
+        setNotice({ type: "error", message: t("admin.common.saveFailed") });
+      }
     } finally {
-      setIsSaving(false);
+      if (!silent) setIsSaving(false);
     }
   }
+
+  // Auto-save effect
+  useEffect(() => {
+    if (!isAutoSaveEnabled || isLoading || !editingId) return;
+
+    const timer = setTimeout(() => {
+      const viAch = form.achievementsTextVI.split("\n").map(t => t.trim()).filter(Boolean);
+      const enAch = form.achievementsTextEN.split("\n").map(t => t.trim()).filter(Boolean);
+      const maxAch = Math.max(viAch.length, enAch.length);
+      const achievements: LocalizedString[] = [];
+      for (let i = 0; i < maxAch; i++) {
+        achievements.push({ vi: viAch[i] || "", en: enAch[i] || "" });
+      }
+
+      const payload = {
+        title: form.title,
+        period: form.period,
+        abstract: form.abstract,
+        authors: form.authorsText.split(",").map(t => t.trim()).filter(Boolean),
+        technologies: form.technologiesText.split(",").map(t => t.trim()).filter(Boolean),
+        achievements,
+        demoUrl: form.demoUrl,
+        documentUrl: form.documentUrl,
+        order: Number(form.order),
+      };
+      void saveData(editingId, payload, true);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [form, isAutoSaveEnabled, isLoading, editingId]);
 
   async function handleDelete(id: string) {
     if (!window.confirm(t("admin.common.deleteConfirm"))) return;

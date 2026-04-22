@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { PortfolioActivity, LocalizedString } from "@/types/portfolio";
 
-export function AdminActivitiesTab() {
+export function AdminActivitiesTab({ isAutoSaveEnabled = false }: { isAutoSaveEnabled?: boolean }) {
   const { t, language } = useLanguage();
   const [data, setData] = useState<PortfolioActivity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -50,14 +50,17 @@ export function AdminActivitiesTab() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setIsSaving(true);
-    setNotice(null);
-
     const payload = { ...form, order: Number(form.order) };
+    await saveData(editingId, payload);
+  }
+
+  async function saveData(id: string | null, payload: any, silent = false) {
+    if (!silent) setIsSaving(true);
+    if (!silent) setNotice(null);
 
     try {
-      const endpoint = editingId ? `/api/activities/${editingId}` : "/api/activities";
-      const method = editingId ? "PATCH" : "POST";
+      const endpoint = id ? `/api/activities/${id}` : "/api/activities";
+      const method = id ? "PATCH" : "POST";
       const res = await fetch(endpoint, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -66,16 +69,32 @@ export function AdminActivitiesTab() {
 
       if (!res.ok) throw new Error("Save failed");
 
-      setNotice({ type: "success", message: t("admin.common.saveSuccess") });
-      setEditingId(null);
-      setForm({ ...emptyForm, order: data.length + 1 });
-      await loadData();
+      if (!silent) {
+        setNotice({ type: "success", message: t("admin.common.saveSuccess") });
+        setEditingId(null);
+        setForm({ ...emptyForm, order: data.length + 1 });
+        await loadData();
+      }
     } catch {
-      setNotice({ type: "error", message: t("admin.common.saveFailed") });
+      if (!silent) {
+        setNotice({ type: "error", message: t("admin.common.saveFailed") });
+      }
     } finally {
-      setIsSaving(false);
+      if (!silent) setIsSaving(false);
     }
   }
+
+  // Auto-save effect
+  useEffect(() => {
+    if (!isAutoSaveEnabled || isLoading || !editingId) return;
+
+    const timer = setTimeout(() => {
+      const payload = { ...form, order: Number(form.order) };
+      void saveData(editingId, payload, true);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [form, isAutoSaveEnabled, isLoading, editingId]);
 
   async function handleDelete(id: string) {
     if (!window.confirm(t("admin.common.deleteConfirm"))) return;

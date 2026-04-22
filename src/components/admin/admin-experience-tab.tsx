@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { PortfolioExperience, LocalizedString } from "@/types/portfolio";
 
-export function AdminExperienceTab() {
+export function AdminExperienceTab({ isAutoSaveEnabled = false }: { isAutoSaveEnabled?: boolean }) {
   const { t, language } = useLanguage();
   const [data, setData] = useState<PortfolioExperience[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -51,27 +51,6 @@ export function AdminExperienceTab() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setIsSaving(true);
-    setNotice(null);
-
-    const payload = {
-      company: form.company,
-      role: form.role,
-      period: form.period,
-      tasks: [
-        ...form.tasksTextVI.split("\n").map(t => t.trim()).filter(Boolean).map(text => ({ vi: text, en: "" })),
-        ...form.tasksTextEN.split("\n").map(t => t.trim()).filter(Boolean).map(text => ({ vi: "", en: text }))
-      ].reduce((acc: LocalizedString[], curr) => {
-          // This is a bit tricky since we want to pair VI and EN tasks if possible.
-          // For now, simpler: user enters VI tasks and EN tasks separately.
-          // BUT wait, tasks should be an array of LocalizedStrings.
-          // Let's assume the user enters them in the same order.
-          return acc;
-      }, []),
-    };
-
-    // Re-thinking payload tasks logic:
-    // User should enter VI and EN tasks line by line. We pair them by index.
     const viTasks = form.tasksTextVI.split("\n").map(t => t.trim()).filter(Boolean);
     const enTasks = form.tasksTextEN.split("\n").map(t => t.trim()).filter(Boolean);
     const maxTasks = Math.max(viTasks.length, enTasks.length);
@@ -93,27 +72,65 @@ export function AdminExperienceTab() {
       order: Number(form.order),
     };
 
+    await saveData(editingId, finalPayload);
+  }
+
+  async function saveData(id: string | null, payload: any, silent = false) {
+    if (!silent) setIsSaving(true);
+    if (!silent) setNotice(null);
+
     try {
-      const endpoint = editingId ? `/api/experience/${editingId}` : "/api/experience";
-      const method = editingId ? "PATCH" : "POST";
+      const endpoint = id ? `/api/experience/${id}` : "/api/experience";
+      const method = id ? "PATCH" : "POST";
       const res = await fetch(endpoint, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(finalPayload),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) throw new Error("Save failed");
 
-      setNotice({ type: "success", message: t("admin.common.saveSuccess") });
-      setEditingId(null);
-      setForm({ ...emptyForm, order: data.length + 1 });
-      await loadData();
+      if (!silent) {
+        setNotice({ type: "success", message: t("admin.common.saveSuccess") });
+        setEditingId(null);
+        setForm({ ...emptyForm, order: data.length + 1 });
+        await loadData();
+      }
     } catch {
-      setNotice({ type: "error", message: t("admin.common.saveFailed") });
+      if (!silent) {
+        setNotice({ type: "error", message: t("admin.common.saveFailed") });
+      }
     } finally {
-      setIsSaving(false);
+      if (!silent) setIsSaving(false);
     }
   }
+
+  // Auto-save effect
+  useEffect(() => {
+    if (!isAutoSaveEnabled || isLoading || !editingId) return;
+
+    const timer = setTimeout(() => {
+      const viTasks = form.tasksTextVI.split("\n").map(t => t.trim()).filter(Boolean);
+      const enTasks = form.tasksTextEN.split("\n").map(t => t.trim()).filter(Boolean);
+      const maxTasks = Math.max(viTasks.length, enTasks.length);
+      const tasks: LocalizedString[] = [];
+      for (let i = 0; i < maxTasks; i++) {
+        tasks.push({ vi: viTasks[i] || "", en: enTasks[i] || "" });
+      }
+
+      const finalPayload = {
+        company: form.company,
+        role: form.role,
+        period: form.period,
+        tasks,
+        techStack: form.techStackText.split(",").map(t => t.trim()).filter(Boolean),
+        order: Number(form.order),
+      };
+      void saveData(editingId, finalPayload, true);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [form, isAutoSaveEnabled, isLoading, editingId]);
 
   async function handleDelete(id: string) {
     if (!window.confirm(t("admin.common.deleteConfirm"))) return;

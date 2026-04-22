@@ -74,6 +74,7 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isAutoSaveEnabled, setIsAutoSaveEnabled] = useState(false);
   const [notice, setNotice] = useState<Notice>(null);
 
   const [profile, setProfile] = useState<Omit<PortfolioProfile, "id">>(
@@ -138,10 +139,10 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
     }
   }
 
-  async function handleProfileSave(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setIsSaving(true);
-    setNotice(null);
+  // Refactored profile save logic to be callable by auto-save
+  async function saveProfileData(data: Omit<PortfolioProfile, "id">, silent = false) {
+    if (!silent) setIsSaving(true);
+    if (!silent) setNotice(null);
 
     try {
       const response = await fetch("/api/profile", {
@@ -149,45 +150,128 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(profile),
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) {
         const payload = (await response.json()) as { message?: string; error?: string };
-        const errorDetail = payload.error ? ` (${payload.error})` : "";
-        throw new Error((payload.message ?? t("admin.notice.profileSaveFailed")) + errorDetail);
+        throw new Error(payload.message ?? t("admin.notice.profileSaveFailed"));
       }
 
-      setNotice({
-        type: "success",
-        message: t("admin.notice.profileSaved"),
-      });
+      if (!silent) {
+        setNotice({
+          type: "success",
+          message: t("admin.notice.profileSaved"),
+        });
+      }
     } catch (error) {
-      setNotice({
-        type: "error",
-        message:
-          error instanceof Error
-            ? error.message
-            : t("admin.notice.profileSaveError"),
-      });
+      if (!silent) {
+        setNotice({
+          type: "error",
+          message: error instanceof Error ? error.message : t("admin.notice.profileSaveError"),
+        });
+      }
     } finally {
-      setIsSaving(false);
+      if (!silent) setIsSaving(false);
     }
   }
 
-  async function handleProjectSubmit(event: React.FormEvent<HTMLFormElement>) {
+  // Auto-save effect for Profile
+  useEffect(() => {
+    if (!isAutoSaveEnabled || isLoading) return;
+
+    const timer = setTimeout(() => {
+      void saveProfileData(profile, true);
+    }, 2000); // 2 second debounce
+
+    return () => clearTimeout(timer);
+  }, [profile, isAutoSaveEnabled, isLoading]);
+
+  async function handleProfileSave(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setIsSaving(true);
-    setNotice(null);
+    await saveProfileData(profile);
+  }
+
+  async function saveProjectData(projectId: string | null, data: any, silent = false) {
+    if (!silent) setIsSaving(true);
+    if (!silent) setNotice(null);
+
+    const endpoint = projectId
+      ? `/api/projects/${projectId}`
+      : "/api/projects";
+    const method = projectId ? "PATCH" : "POST";
+
+    try {
+      const response = await fetch(endpoint, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const result = (await response.json()) as { message?: string; error?: string };
+        throw new Error(result.message ?? t("admin.notice.projectSaveFailed"));
+      }
+
+      if (!silent) {
+        setNotice({
+          type: "success",
+          message: projectId
+            ? t("admin.notice.projectUpdated")
+            : t("admin.notice.projectCreated"),
+        });
+
+        if (!projectId) {
+          setProjectForm({
+            ...emptyProjectState,
+            order: Math.max(1, projects.length + 1),
+          });
+        }
+        await loadDashboardData();
+      }
+    } catch (error) {
+      if (!silent) {
+        setNotice({
+          type: "error",
+          message: error instanceof Error ? error.message : t("admin.notice.projectSaveError"),
+        });
+      }
+    } finally {
+      if (!silent) setIsSaving(false);
+    }
+  }
+
+  // Auto-save effect for Projects (only when editing)
+  useEffect(() => {
+    if (!isAutoSaveEnabled || isLoading || !editingProjectId) return;
 
     const stack = parseStackInput(projectForm.stackText);
+    if (stack.length === 0) return;
 
+    const timer = setTimeout(() => {
+      const payload = {
+        title: projectForm.title,
+        summary: projectForm.summary,
+        stack,
+        imageUrl: projectForm.imageUrl,
+        demoUrl: projectForm.demoUrl,
+        repoUrl: projectForm.repoUrl,
+        featured: projectForm.featured,
+        order: Number(projectForm.order),
+      };
+      void saveProjectData(editingProjectId, payload, true);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [projectForm, isAutoSaveEnabled, isLoading, editingProjectId]);
+
+  async function handleProjectSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const stack = parseStackInput(projectForm.stackText);
     if (stack.length === 0) {
-      setNotice({
-        type: "error",
-        message: t("admin.notice.requireStack"),
-      });
-      setIsSaving(false);
+      setNotice({ type: "error", message: t("admin.notice.requireStack") });
       return;
     }
 
@@ -202,49 +286,9 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
       order: Number(projectForm.order),
     };
 
-    const endpoint = editingProjectId
-      ? `/api/projects/${editingProjectId}`
-      : "/api/projects";
-    const method = editingProjectId ? "PATCH" : "POST";
-
-    try {
-      const response = await fetch(endpoint, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const result = (await response.json()) as { message?: string; error?: string };
-        const errorDetail = result.error ? ` (${result.error})` : "";
-        throw new Error((result.message ?? t("admin.notice.projectSaveFailed")) + errorDetail);
-      }
-
-      setNotice({
-        type: "success",
-        message: editingProjectId
-          ? t("admin.notice.projectUpdated")
-          : t("admin.notice.projectCreated"),
-      });
-
+    await saveProjectData(editingProjectId, payload);
+    if (!editingProjectId) {
       setEditingProjectId(null);
-      setProjectForm({
-        ...emptyProjectState,
-        order: Math.max(1, projects.length + 1),
-      });
-      await loadDashboardData();
-    } catch (error) {
-      setNotice({
-        type: "error",
-        message:
-          error instanceof Error
-            ? error.message
-            : t("admin.notice.projectSaveError"),
-      });
-    } finally {
-      setIsSaving(false);
     }
   }
 
@@ -413,6 +457,23 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
               </h1>
             </div>
             <div className="flex items-center gap-2">
+              <div className="mr-4 flex items-center gap-2 rounded-2xl border border-white/40 bg-white/30 px-3 py-1.5 dark:border-zinc-700 dark:bg-zinc-800/50">
+                <span className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
+                  Auto Save
+                </span>
+                <button
+                  onClick={() => setIsAutoSaveEnabled(!isAutoSaveEnabled)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                    isAutoSaveEnabled ? "bg-orange-500" : "bg-zinc-300 dark:bg-zinc-700"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      isAutoSaveEnabled ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+              </div>
               <LanguageSwitcher />
               <ThemeToggle />
               <Button variant="outline" onClick={() => void loadDashboardData()}>
@@ -886,9 +947,9 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
           </form>
         ) : null}
 
-        {!isLoading && activeTab === "experience" && <AdminExperienceTab />}
-        {!isLoading && activeTab === "activities" && <AdminActivitiesTab />}
-        {!isLoading && activeTab === "research" && <AdminResearchTab />}
+        {!isLoading && activeTab === "experience" && <AdminExperienceTab isAutoSaveEnabled={isAutoSaveEnabled} />}
+        {!isLoading && activeTab === "activities" && <AdminActivitiesTab isAutoSaveEnabled={isAutoSaveEnabled} />}
+        {!isLoading && activeTab === "research" && <AdminResearchTab isAutoSaveEnabled={isAutoSaveEnabled} />}
       </div>
     </div>
   );
