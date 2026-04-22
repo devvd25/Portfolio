@@ -75,6 +75,7 @@ export interface PortfolioActivity {
   category: "community" | "workshop" | "qualification";
   date?: string;
   order: number;
+  isHidden: boolean;
 }
 
 export interface PortfolioResearch {
@@ -88,6 +89,7 @@ export interface PortfolioResearch {
   demoUrl: string;
   documentUrl: string;
   order: number;
+  isHidden: boolean;
 }
 
 export interface AdminSession extends JWTPayload {

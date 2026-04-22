@@ -26,6 +26,7 @@ const researchSchema = new Schema(
     demoUrl: { type: String, default: "", trim: true },
     documentUrl: { type: String, default: "", trim: true },
     order: { type: Number, required: true, min: 1, default: 1 },
+    isHidden: { type: Boolean, default: false },
   },
   { timestamps: true },
 );

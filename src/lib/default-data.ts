@@ -190,6 +190,7 @@ export const defaultActivitiesSeed: Array<Omit<PortfolioActivity, "id">> = [
     imageUrl: "/activities/beach-cleanup.png",
     category: "community",
     order: 1,
+    isHidden: false,
   },
   {
     title: {
@@ -203,6 +204,7 @@ export const defaultActivitiesSeed: Array<Omit<PortfolioActivity, "id">> = [
     imageUrl: "/activities/museum-visit.png",
     category: "community",
     order: 2,
+    isHidden: false,
   },
   {
     title: {
@@ -216,8 +218,13 @@ export const defaultActivitiesSeed: Array<Omit<PortfolioActivity, "id">> = [
     imageUrl: "/activities/digital-transformation.png",
     category: "workshop",
     order: 1,
+    isHidden: false,
   }
 ];
+
+export function buildLocalOtherExperience() {
+  return [];
+}
 
 export const defaultResearchSeed: Array<Omit<PortfolioResearch, "id">> = [
   {
@@ -252,5 +259,12 @@ export const defaultResearchSeed: Array<Omit<PortfolioResearch, "id">> = [
     demoUrl: "https://huggingface.co/spaces/viugialai/Flower-Recognition-Using-Deep-Learning",
     documentUrl: "https://v0-portfolio-viu.vercel.app/ICT2026-Flower-Classification-Research.docx",
     order: 1,
+    isHidden: false,
   }
 ];
+
+export const buildLocalProfile = () => defaultProfileSeed;
+export const buildLocalProjects = () => defaultProjectsSeed;
+export const buildLocalExperience = () => defaultExperienceSeed;
+export const buildLocalActivities = () => defaultActivitiesSeed;
+export const buildLocalResearch = () => defaultResearchSeed;

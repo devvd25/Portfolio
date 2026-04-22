@@ -1,81 +1,42 @@
-import {
-  FALLBACK_AVATAR_URL,
-  defaultProfileSeed,
-  defaultProjectsSeed,
-  defaultExperienceSeed,
-  defaultActivitiesSeed,
-  defaultResearchSeed,
-} from "@/lib/default-data";
-import { PortfolioProfileModel } from "@/models/PortfolioProfile";
-import { ProjectModel } from "@/models/Project";
-import { ExperienceModel } from "@/models/Experience";
 import { ActivityModel } from "@/models/Activity";
-import { ResearchModel } from "@/models/Research";
+import { ExperienceModel } from "@/models/Experience";
 import { OtherExperienceModel } from "@/models/OtherExperience";
+import { PortfolioProfileModel } from "@/models/Profile";
+import { ProjectModel } from "@/models/Project";
+import { ResearchModel } from "@/models/Research";
 import type { 
   PortfolioProfile, 
-  PortfolioProject,
-  PortfolioExperience,
-  PortfolioOtherExperience,
-  PortfolioActivity,
-  PortfolioResearch,
-  LocalizedString,
+  PortfolioProject, 
+  PortfolioExperience, 
+  PortfolioOtherExperience, 
+  PortfolioActivity, 
+  PortfolioResearch, 
+  LocalizedString 
 } from "@/types/portfolio";
-
+import { 
+  buildLocalProfile, 
+  buildLocalProjects, 
+  buildLocalExperience, 
+  buildLocalOtherExperience, 
+  buildLocalActivities, 
+  buildLocalResearch 
+} from "./default-data";
 import { connectToDatabase, isMongoConfigured } from "./db";
 
-function ensureLocalized(value: any, fallback: string = ""): LocalizedString {
-  if (value && typeof value === "object" && "vi" in value && "en" in value) {
-    return value as LocalizedString;
-  }
-  const str = typeof value === "string" ? value : fallback;
-  return { vi: str, en: str };
-}
+const FALLBACK_AVATAR_URL = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80";
 
-function ensureLocalizedArray(value: any): LocalizedString[] {
-  if (Array.isArray(value)) {
-    return value.map(item => ensureLocalized(item));
-  }
-  return [];
-}
-
-function buildLocalProfile(): PortfolioProfile {
+function ensureLocalized(val: any): LocalizedString {
+  if (!val) return { vi: "", en: "" };
+  if (typeof val === "string") return { vi: val, en: val };
   return {
-    id: "local-profile",
-    ...defaultProfileSeed,
+    vi: val.vi || "",
+    en: val.en || "",
   };
 }
 
-function buildLocalProjects(): PortfolioProject[] {
-  return defaultProjectsSeed.map((project, index) => ({
-    id: `local-project-${index + 1}`,
-    ...project,
-  }));
-}
-
-function buildLocalExperience(): PortfolioExperience[] {
-  return defaultExperienceSeed.map((exp, index) => ({
-    id: `local-exp-${index + 1}`,
-    ...exp,
-  }));
-}
-
-function buildLocalOtherExperience(): PortfolioOtherExperience[] {
-  return []; // No default seeds for other experience yet
-}
-
-function buildLocalActivities(): PortfolioActivity[] {
-  return defaultActivitiesSeed.map((act, index) => ({
-    id: `local-act-${index + 1}`,
-    ...act,
-  }));
-}
-
-function buildLocalResearch(): PortfolioResearch[] {
-  return defaultResearchSeed.map((res, index) => ({
-    id: `local-res-${index + 1}`,
-    ...res,
-  }));
+function ensureLocalizedArray(val: any): LocalizedString[] {
+  if (!Array.isArray(val)) return [];
+  return val.map((item) => ensureLocalized(item));
 }
 
 export function serializeProfile(profile: any): PortfolioProfile {
@@ -111,6 +72,7 @@ export function serializeProject(project: any): PortfolioProject {
     repoUrl: project.repoUrl ?? "",
     featured: Boolean(project.featured),
     order: project.order,
+    isHidden: Boolean(project.isHidden),
   };
 }
 
@@ -150,6 +112,7 @@ export function serializeActivity(doc: any): PortfolioActivity {
     category: doc.category,
     date: doc.date ?? "",
     order: doc.order,
+    isHidden: Boolean(doc.isHidden),
   };
 }
 
@@ -165,32 +128,38 @@ export function serializeResearch(doc: any): PortfolioResearch {
     demoUrl: doc.demoUrl ?? "",
     documentUrl: doc.documentUrl ?? "",
     order: doc.order,
+    isHidden: Boolean(doc.isHidden),
   };
 }
 
 async function ensureSeedData() {
-  await connectToDatabase();
+  const profileCount = await PortfolioProfileModel.countDocuments();
+  if (profileCount === 0) {
+    await PortfolioProfileModel.create({ key: "main", ...buildLocalProfile() });
+  }
 
-  const existingProfile = await PortfolioProfileModel.findOne({ key: "main" }).lean();
+  const projectCount = await ProjectModel.countDocuments();
+  if (projectCount === 0) {
+    const localProjects = buildLocalProjects();
+    await ProjectModel.insertMany(localProjects);
+  }
 
-  if (!existingProfile) {
-    // This is a fresh database, seed everything
-    await PortfolioProfileModel.create({
-      key: "main",
-      ...defaultProfileSeed,
-    });
+  const expCount = await ExperienceModel.countDocuments();
+  if (expCount === 0) {
+    const localExp = buildLocalExperience();
+    await ExperienceModel.insertMany(localExp);
+  }
 
-    await ProjectModel.insertMany(
-      defaultProjectsSeed.map((project, index) => ({
-        ...project,
-        order: project.order || index + 1,
-      })),
-    );
+  const actCount = await ActivityModel.countDocuments();
+  if (actCount === 0) {
+    const localAct = buildLocalActivities();
+    await ActivityModel.insertMany(localAct);
+  }
 
-    await ExperienceModel.insertMany(defaultExperienceSeed);
-    await ActivityModel.insertMany(defaultActivitiesSeed);
-    await ResearchModel.insertMany(defaultResearchSeed);
-    return;
+  const resCount = await ResearchModel.countDocuments();
+  if (resCount === 0) {
+    const localRes = buildLocalResearch();
+    await ResearchModel.insertMany(localRes);
   }
 }
 
@@ -208,6 +177,7 @@ export async function getPortfolioSnapshot() {
   }
 
   try {
+    await connectToDatabase();
     await ensureSeedData();
 
     const [profileDoc, projectDocs, expDocs, otherExpDocs, actDocs, resDocs] = await Promise.all([

@@ -19,6 +19,7 @@ const activitySchema = new Schema(
     },
     date: { type: String, default: "", trim: true },
     order: { type: Number, required: true, min: 1, default: 1 },
+    isHidden: { type: Boolean, default: false },
   },
   { timestamps: true },
 );

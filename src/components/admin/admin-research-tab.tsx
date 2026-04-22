@@ -1,7 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/components/language-provider";
-import { Plus, Save, Trash2, UploadCloud } from "lucide-react";
+import { Plus, Save, Trash2, UploadCloud, Eye, EyeOff } from "lucide-react";
 import { useEffect, useMemo, useState, useRef } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -31,6 +31,7 @@ export function AdminResearchTab({ isAutoSaveEnabled = false }: { isAutoSaveEnab
     demoUrl: "",
     documentUrl: "",
     order: 1,
+    isHidden: false,
   };
   const [form, setForm] = useState(emptyForm);
 
@@ -106,6 +107,7 @@ export function AdminResearchTab({ isAutoSaveEnabled = false }: { isAutoSaveEnab
       demoUrl: form.demoUrl,
       documentUrl: form.documentUrl,
       order: Number(form.order),
+      isHidden: form.isHidden,
     };
 
     await saveData(editingId, payload);
@@ -164,6 +166,7 @@ export function AdminResearchTab({ isAutoSaveEnabled = false }: { isAutoSaveEnab
         demoUrl: form.demoUrl,
         documentUrl: form.documentUrl,
         order: Number(form.order),
+        isHidden: form.isHidden,
       };
       void saveData(editingId, payload, true);
     }, 2000);
@@ -199,6 +202,7 @@ export function AdminResearchTab({ isAutoSaveEnabled = false }: { isAutoSaveEnab
       demoUrl: item.demoUrl,
       documentUrl: item.documentUrl,
       order: item.order,
+      isHidden: item.isHidden || false,
     });
   }
 
@@ -302,7 +306,20 @@ export function AdminResearchTab({ isAutoSaveEnabled = false }: { isAutoSaveEnab
           </div>
         </div>
 
-        <Button type="submit" disabled={isSaving} className="w-full">
+        <div className="flex items-center gap-2 py-2">
+          <input 
+            type="checkbox" 
+            id="researchIsHidden" 
+            checked={form.isHidden} 
+            onChange={e => setForm({ ...form, isHidden: e.target.checked })}
+            className="h-4 w-4 rounded border-zinc-300"
+          />
+          <label htmlFor="researchIsHidden" className="text-sm font-bold text-red-500 cursor-pointer">
+            Ẩn nghiên cứu này trên website
+          </label>
+        </div>
+
+        <Button type="submit" disabled={isSaving} className="w-full h-12 rounded-2xl">
           {editingId ? <Save className="h-4 w-4 mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
           {editingId ? t("admin.common.update") : t("admin.common.create")}
         </Button>
@@ -312,10 +329,13 @@ export function AdminResearchTab({ isAutoSaveEnabled = false }: { isAutoSaveEnab
         <h2 className="font-display text-2xl font-black text-zinc-900 dark:text-zinc-50">{t("admin.research.list")}</h2>
         <div className="space-y-3">
           {sortedData.map(item => (
-            <article key={item.id} className="rounded-2xl border border-zinc-200 bg-white/80 p-4 dark:border-zinc-700 dark:bg-zinc-900/70 flex justify-between">
-              <div>
-                <h3 className="font-semibold text-sm line-clamp-1">{item.title[language]}</h3>
-                <p className="text-xs text-muted-foreground">{item.period[language]}</p>
+            <article key={item.id} className={`rounded-2xl border border-zinc-200 bg-white/80 p-4 dark:border-zinc-700 dark:bg-zinc-900/70 flex justify-between items-center ${item.isHidden ? "opacity-50 border-red-100" : ""}`}>
+              <div className="flex items-center gap-3">
+                {item.isHidden && <EyeOff className="h-4 w-4 text-red-500" />}
+                <div>
+                  <h3 className="font-semibold text-sm line-clamp-1">{item.title[language]}</h3>
+                  <p className="text-xs text-muted-foreground">{item.period[language]}</p>
+                </div>
               </div>
               <div className="flex gap-2">
                 <Button size="sm" variant="outline" onClick={() => handleEdit(item)}>{t("admin.common.edit")}</Button>
@@ -323,6 +343,7 @@ export function AdminResearchTab({ isAutoSaveEnabled = false }: { isAutoSaveEnab
               </div>
             </article>
           ))}
+          {data.length === 0 && <p className="text-center text-zinc-400 italic py-8">Chưa có nghiên cứu nào.</p>}
         </div>
       </div>
     </div>
