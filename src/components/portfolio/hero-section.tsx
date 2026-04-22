@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, Mail } from "lucide-react";
+import { ArrowRight, Mail, Download } from "lucide-react";
 import Image from "next/image";
 
 import { useLanguage } from "@/components/language-provider";
@@ -60,6 +60,18 @@ export function HeroSection({ profile }: HeroSectionProps) {
               className={cn(buttonVariants({ variant: "outline", size: "lg" }), "rounded-2xl")}
             >
               GitHub
+            </a>
+          ) : null}
+          {profile.cvUrl ? (
+            <a
+              href={profile.cvUrl}
+              target="_blank"
+              rel="noreferrer"
+              download
+              className={cn(buttonVariants({ variant: "outline", size: "lg" }), "rounded-2xl border-sky-200 bg-sky-50/50 hover:bg-sky-100 dark:border-sky-500/30 dark:bg-sky-500/10 dark:hover:bg-sky-500/20")}
+            >
+              <Download className="h-4 w-4 text-sky-500" />
+              {t("portfolio.hero.downloadCv")}
             </a>
           ) : null}
         </div>
