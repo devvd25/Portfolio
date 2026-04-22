@@ -102,42 +102,36 @@ export const defaultProjectsSeed: Array<Omit<PortfolioProject, "id">> = [
 export const defaultSkills: SkillCategory[] = [
   {
     title: {
-      vi: "Kỹ thuật Frontend",
-      en: "Frontend Craft",
+      vi: "Frontend",
+      en: "Frontend",
     },
     description: {
-      vi: "Giao diện tương tác với kiến trúc ưu tiên hiệu suất.",
-      en: "Interactive interfaces with performance-first architecture.",
+      vi: "Phát triển giao diện web cơ bản và tương tác người dùng",
+      en: "Basic web interface development and user interaction",
     },
-    items: [
-      "Next.js App Router",
-      "React 19",
-      "TypeScript",
-      "Tailwind CSS",
-      "Framer Motion",
-    ],
+    items: ["ReactJS", "HTML, CSS", "JavaScript"],
   },
   {
     title: {
-      vi: "Kỹ thuật Backend",
-      en: "Backend Engineering",
+      vi: "Backend",
+      en: "Backend",
     },
     description: {
-      vi: "API an toàn và thiết kế dịch vụ có khả năng mở rộng.",
-      en: "Secure APIs and scalable service design.",
+      vi: "Xây dựng ứng dụng web với xử lý dữ liệu và API",
+      en: "Building web applications with data processing and APIs",
     },
-    items: ["Node.js", "REST APIs", "Auth", "Caching", "Validation"],
+    items: ["NodeJS", "Django", "REST API"],
   },
   {
     title: {
-      vi: "Dữ liệu & DevOps",
-      en: "Data and DevOps",
+      vi: "Cơ sở dữ liệu & Công cụ",
+      en: "Databases & Tools",
     },
     description: {
-      vi: "Luồng triển khai đáng tin cậy và vận hành trên đám mây.",
-      en: "Reliable deployment pipelines and cloud operations.",
+      vi: "Lưu trữ dữ liệu và hỗ trợ phát triển",
+      en: "Data storage and development support",
     },
-    items: ["MongoDB", "Mongoose", "Vercel", "CI/CD", "Monitoring"],
+    items: ["MongoDB", "SQLite", "GitHub", "AI Tools (ChatGPT, GitHub Copilot)"],
   },
 ];
 
