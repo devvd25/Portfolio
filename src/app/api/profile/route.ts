@@ -19,6 +19,7 @@ function serializeProfile(profile: {
   _id: unknown;
   fullName: string;
   headline: LocalizedString;
+  role: LocalizedString;
   location: LocalizedString;
   bio: LocalizedString;
   email: string;
@@ -26,11 +27,18 @@ function serializeProfile(profile: {
   linkedinUrl?: string;
   avatarUrl?: string;
   cvUrl?: string;
+  stats?: {
+    years: string;
+    projects: string;
+    countries: string;
+    reviews: string;
+  };
 }) {
   return {
     id: String(profile._id),
     fullName: profile.fullName,
     headline: profile.headline,
+    role: profile.role || { vi: "", en: "" },
     location: profile.location,
     bio: profile.bio,
     email: profile.email,
@@ -38,6 +46,12 @@ function serializeProfile(profile: {
     linkedinUrl: profile.linkedinUrl ?? "",
     avatarUrl: profile.avatarUrl || FALLBACK_AVATAR_URL,
     cvUrl: profile.cvUrl ?? "",
+    stats: profile.stats || {
+      years: "",
+      projects: "",
+      countries: "",
+      reviews: "",
+    },
   };
 }
 

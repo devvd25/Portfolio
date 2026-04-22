@@ -18,6 +18,10 @@ const portfolioProfileSchema = new Schema(
       vi: { type: String, required: true, trim: true },
       en: { type: String, required: true, trim: true },
     },
+    role: {
+      vi: { type: String, required: true, trim: true, default: "" },
+      en: { type: String, required: true, trim: true, default: "" },
+    },
     location: {
       vi: { type: String, required: true, trim: true },
       en: { type: String, required: true, trim: true },
@@ -51,6 +55,12 @@ const portfolioProfileSchema = new Schema(
       type: String,
       default: "",
       trim: true,
+    },
+    stats: {
+      years: { type: String, default: "0+" },
+      projects: { type: String, default: "0+" },
+      countries: { type: String, default: "0" },
+      reviews: { type: String, default: "5.0" },
     },
   },
   {

@@ -22,6 +22,7 @@ export const loginSchema = z.object({
 export const profileSchema = z.object({
   fullName: z.string().trim().min(2, "Ten qua ngan."),
   headline: localizedStringSchema(5, "Headline"),
+  role: localizedStringSchema(2, "Chức danh"),
   location: localizedStringSchema(2, "Dia diem"),
   bio: localizedStringSchema(20, "Bio"),
   email: z.email("Email khong hop le.").trim(),
@@ -29,6 +30,12 @@ export const profileSchema = z.object({
   linkedinUrl: optionalHttpUrl,
   avatarUrl: optionalHttpUrl,
   cvUrl: optionalHttpUrl,
+  stats: z.object({
+    years: z.string().default(""),
+    projects: z.string().default(""),
+    countries: z.string().default(""),
+    reviews: z.string().default(""),
+  }).optional(),
 });
 
 export const projectSchema = z.object({
