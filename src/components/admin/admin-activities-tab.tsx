@@ -1,8 +1,8 @@
 "use client";
 
 import { useLanguage } from "@/components/language-provider";
-import { Plus, Save, Trash2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { Plus, Save, Trash2, UploadCloud } from "lucide-react";
+import { useEffect, useMemo, useState, useRef } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,8 +14,10 @@ export function AdminActivitiesTab({ isAutoSaveEnabled = false }: { isAutoSaveEn
   const [data, setData] = useState<PortfolioActivity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const emptyLocalizedString: LocalizedString = { vi: "", en: "" };
   const emptyForm = {
@@ -111,6 +113,37 @@ export function AdminActivitiesTab({ isAutoSaveEnabled = false }: { isAutoSaveEn
     }
   }
 
+  async function handleFileUpload(file: File) {
+    setIsUploading(true);
+    setNotice(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const payload = (await res.json()) as { message?: string };
+        throw new Error(payload.message || t("admin.notice.uploadFailed"));
+      }
+
+      const result = await res.json();
+      setForm((prev) => ({ ...prev, imageUrl: result.url }));
+      setNotice({ type: "success", message: t("admin.common.uploadSuccess") || "Upload thành công!" });
+    } catch (error) {
+      setNotice({ 
+        type: "error", 
+        message: error instanceof Error ? error.message : "Lỗi upload" 
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  }
+
   function handleEdit(item: PortfolioActivity) {
     setEditingId(item.id);
     setForm({
@@ -170,7 +203,37 @@ export function AdminActivitiesTab({ isAutoSaveEnabled = false }: { isAutoSaveEn
           <label className="text-sm font-semibold">{t("admin.experience.order")} <Input type="number" required value={form.order} onChange={e => setForm({ ...form, order: Number(e.target.value) })} className="mt-1" /></label>
         </div>
 
-        <label className="text-sm font-semibold block">{t("admin.activities.imageUrl")} <Input value={form.imageUrl} onChange={e => setForm({ ...form, imageUrl: e.target.value })} /></label>
+        <div className="space-y-2">
+          <label className="text-sm font-semibold block">{t("admin.activities.imageUrl")} 
+            <div className="flex gap-2 mt-1">
+              <Input 
+                value={form.imageUrl} 
+                onChange={e => setForm({ ...form, imageUrl: e.target.value })} 
+                className="flex-1"
+              />
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                ref={fileInputRef}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) void handleFileUpload(file);
+                }}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isUploading}
+                onClick={() => fileInputRef.current?.click()}
+                className="shrink-0"
+              >
+                <UploadCloud className="h-4 w-4 mr-2 text-sky-500" />
+                {isUploading ? "..." : "Upload"}
+              </Button>
+            </div>
+          </label>
+        </div>
 
         <Button type="submit" disabled={isSaving} className="w-full">
           {editingId ? <Save className="h-4 w-4 mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
