@@ -82,9 +82,13 @@ export async function POST(request: Request) {
       url: uploadedAsset.secure_url,
       publicId: uploadedAsset.public_id,
     });
-  } catch {
+  } catch (error) {
+    console.error("Upload error:", error);
     return NextResponse.json(
-      { message: "Khong the upload anh luc nay." },
+      { 
+        message: "Lỗi upload: " + (error instanceof Error ? error.message : "Không xác định"),
+        error: error
+      },
       { status: 500 },
     );
   }
