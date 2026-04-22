@@ -7,29 +7,7 @@ import { ExperienceModel } from "@/models/Experience";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-function serializeExperience(doc: {
-  _id: unknown;
-  company: string;
-  role: string;
-  period: string;
-  tasks: string[];
-  techStack: string[];
-  companyImageUrl?: string;
-  environmentImageUrl?: string;
-  order: number;
-}) {
-  return {
-    id: String(doc._id),
-    company: doc.company,
-    role: doc.role,
-    period: doc.period,
-    tasks: doc.tasks,
-    techStack: doc.techStack,
-    companyImageUrl: doc.companyImageUrl ?? "",
-    environmentImageUrl: doc.environmentImageUrl ?? "",
-    order: doc.order,
-  };
-}
+import { serializeExperience } from "@/lib/portfolio-data";
 
 export async function GET() {
   if (!isMongoConfigured()) {
@@ -60,16 +38,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const payload = (await request.json()) as {
-      company: string;
-      role: string;
-      period: string;
-      tasks?: string[];
-      techStack?: string[];
-      companyImageUrl?: string;
-      environmentImageUrl?: string;
-      order?: number;
-    };
+    const payload = await request.json();
 
     await connectToDatabase();
 

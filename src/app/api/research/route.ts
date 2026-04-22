@@ -7,31 +7,7 @@ import { ResearchModel } from "@/models/Research";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-function serializeResearch(doc: {
-  _id: unknown;
-  title: string;
-  period: string;
-  authors: string[];
-  abstract: string;
-  technologies: string[];
-  achievements: string[];
-  demoUrl?: string;
-  documentUrl?: string;
-  order: number;
-}) {
-  return {
-    id: String(doc._id),
-    title: doc.title,
-    period: doc.period,
-    authors: doc.authors,
-    abstract: doc.abstract,
-    technologies: doc.technologies,
-    achievements: doc.achievements,
-    demoUrl: doc.demoUrl ?? "",
-    documentUrl: doc.documentUrl ?? "",
-    order: doc.order,
-  };
-}
+import { serializeResearch } from "@/lib/portfolio-data";
 
 export async function GET() {
   if (!isMongoConfigured()) {
@@ -62,17 +38,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const payload = (await request.json()) as {
-      title: string;
-      period: string;
-      authors?: string[];
-      abstract: string;
-      technologies?: string[];
-      achievements?: string[];
-      demoUrl?: string;
-      documentUrl?: string;
-      order?: number;
-    };
+    const payload = await request.json();
 
     await connectToDatabase();
 

@@ -7,23 +7,7 @@ import { ActivityModel } from "@/models/Activity";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-function serializeActivity(doc: {
-  _id: unknown;
-  title: string;
-  description: string;
-  imageUrl?: string;
-  category: "community" | "workshop";
-  order: number;
-}) {
-  return {
-    id: String(doc._id),
-    title: doc.title,
-    description: doc.description,
-    imageUrl: doc.imageUrl ?? "",
-    category: doc.category,
-    order: doc.order,
-  };
-}
+import { serializeActivity } from "@/lib/portfolio-data";
 
 export async function GET() {
   if (!isMongoConfigured()) {
@@ -54,13 +38,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const payload = (await request.json()) as {
-      title: string;
-      description: string;
-      imageUrl?: string;
-      category: "community" | "workshop";
-      order?: number;
-    };
+    const payload = await request.json();
 
     await connectToDatabase();
 

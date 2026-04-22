@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Save, Trash2 } from "lucide-react";
+import { Plus, Save, Trash2, Pencil } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { useLanguage } from "@/components/language-provider";
@@ -282,7 +282,7 @@ export function AdminExperienceTab({ isAutoSaveEnabled = false }: { isAutoSaveEn
                     <p className="text-[10px] text-muted-foreground">{item.period[language]}</p>
                   </div>
                   <div className="flex gap-1 ml-4 shrink-0">
-                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => handleEdit(item)}><Plus className="h-4 w-4 rotate-45" /></Button>
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => handleEdit(item)}><Pencil className="h-4 w-4" /></Button>
                     <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-red-500" onClick={() => handleDelete(item.id)}><Trash2 className="h-4 w-4" /></Button>
                   </div>
                 </article>
@@ -313,7 +313,7 @@ export function AdminExperienceTab({ isAutoSaveEnabled = false }: { isAutoSaveEn
                     <p className="text-[10px] text-muted-foreground">{item.period[language]}</p>
                   </div>
                   <div className="flex gap-1 ml-4 shrink-0">
-                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => handleEdit(item)}><Plus className="h-4 w-4 rotate-45" /></Button>
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => handleEdit(item)}><Pencil className="h-4 w-4" /></Button>
                     <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-red-500" onClick={() => handleDelete(item.id)}><Trash2 className="h-4 w-4" /></Button>
                   </div>
                 </article>

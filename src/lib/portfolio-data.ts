@@ -156,36 +156,23 @@ async function ensureSeedData() {
   const existingProfile = await PortfolioProfileModel.findOne({ key: "main" }).lean();
 
   if (!existingProfile) {
+    // This is a fresh database, seed everything
     await PortfolioProfileModel.create({
       key: "main",
       ...defaultProfileSeed,
     });
-  }
 
-  const projectCount = await ProjectModel.estimatedDocumentCount();
-
-  if (projectCount === 0) {
     await ProjectModel.insertMany(
       defaultProjectsSeed.map((project, index) => ({
         ...project,
         order: project.order || index + 1,
       })),
     );
-  }
 
-  const expCount = await ExperienceModel.estimatedDocumentCount();
-  if (expCount === 0) {
     await ExperienceModel.insertMany(defaultExperienceSeed);
-  }
-
-  const actCount = await ActivityModel.estimatedDocumentCount();
-  if (actCount === 0) {
     await ActivityModel.insertMany(defaultActivitiesSeed);
-  }
-
-  const resCount = await ResearchModel.estimatedDocumentCount();
-  if (resCount === 0) {
     await ResearchModel.insertMany(defaultResearchSeed);
+    return;
   }
 }
 

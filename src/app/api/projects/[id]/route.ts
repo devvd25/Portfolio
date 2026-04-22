@@ -9,29 +9,7 @@ import { ProjectModel } from "@/models/Project";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-function serializeProject(project: {
-  _id: unknown;
-  title: string;
-  summary: string;
-  stack: string[];
-  imageUrl?: string;
-  demoUrl?: string;
-  repoUrl?: string;
-  featured?: boolean;
-  order: number;
-}) {
-  return {
-    id: String(project._id),
-    title: project.title,
-    summary: project.summary,
-    stack: project.stack,
-    imageUrl: project.imageUrl ?? "",
-    demoUrl: project.demoUrl ?? "",
-    repoUrl: project.repoUrl ?? "",
-    featured: Boolean(project.featured),
-    order: project.order,
-  };
-}
+import { serializeProject } from "@/lib/portfolio-data";
 
 function isValidObjectId(id: string) {
   return /^[a-f\d]{24}$/i.test(id);
