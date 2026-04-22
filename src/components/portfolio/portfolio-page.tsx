@@ -96,13 +96,13 @@ export function PortfolioPage({ profile, projects, skills, experience, activitie
           {...sectionMotion}
           className="grid gap-6 border-t border-orange-100/80 py-20 lg:grid-cols-[1.1fr_0.9fr] dark:border-zinc-800"
         >
-          <div className="space-y-5">
+          <div className="space-y-6">
             <Badge className="from-sky-500 to-cyan-400">{t("portfolio.about.badge")}</Badge>
             <h2 className="font-display text-3xl font-black text-zinc-900 sm:text-4xl dark:text-zinc-50">
-              {t("portfolio.about.heading")}
+              {profile.headline[language]}
             </h2>
             <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-200">
-              {t("portfolio.about.description")}
+              {profile.bio[language]}
             </p>
             <div className="flex flex-wrap gap-4 text-sm text-zinc-700 dark:text-zinc-200">
               <span className="inline-flex items-center gap-2 rounded-2xl border border-orange-200 bg-white/70 px-4 py-2 shadow-[0_10px_20px_rgba(249,115,22,0.14)] dark:border-zinc-700 dark:bg-zinc-900/70">
@@ -111,17 +111,17 @@ export function PortfolioPage({ profile, projects, skills, experience, activitie
               </span>
               <span className="inline-flex items-center gap-2 rounded-2xl border border-sky-200 bg-white/70 px-4 py-2 shadow-[0_10px_20px_rgba(56,189,248,0.14)] dark:border-zinc-700 dark:bg-zinc-900/70">
                 <Sparkles className="h-4 w-4 text-sky-500" />
-                {t("portfolio.about.productEngineer")}
+                {profile.role[language]}
               </span>
             </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             {[
-              { label: t("portfolio.stats.years"), value: "5+" },
-              { label: t("portfolio.stats.projects"), value: "20+" },
-              { label: t("portfolio.stats.countries"), value: "8" },
-              { label: t("portfolio.stats.clientRating"), value: "4.9/5" },
+              { label: t("portfolio.stats.years"), value: profile.stats?.years || "0+" },
+              { label: t("portfolio.stats.projects"), value: profile.stats?.projects || "0+" },
+              { label: t("portfolio.stats.countries"), value: profile.stats?.countries || "0" },
+              { label: t("portfolio.stats.clientRating"), value: profile.stats?.reviews || "5.0" },
             ].map((item) => (
               <div
                 key={item.label}

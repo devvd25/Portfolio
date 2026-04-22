@@ -16,19 +16,29 @@ export const defaultProfileSeed: Omit<PortfolioProfile, "id"> = {
     vi: "Lập trình viên Full-stack tạo ra các sản phẩm kỹ thuật số ý nghĩa",
     en: "Full-stack Developer crafting thoughtful digital products",
   },
+  role: {
+    vi: "Kỹ sư hướng sản phẩm",
+    en: "Product-Oriented Engineer",
+  },
   location: {
-    vi: "Thành phố Hồ Chí Minh, Việt Nam",
-    en: "Ho Chi Minh City, Viet Nam",
+    vi: "Đà Nẵng, Việt Nam",
+    en: "Da Nang, Viet Nam",
   },
   bio: {
-    vi: "Tôi xây dựng các sản phẩm nhanh, thanh lịch với sự tập trung mạnh mẽ vào trải nghiệm người dùng, kiến trúc dễ bảo trì và tác động thực tế đến kinh doanh. Thế mạnh của tôi là đưa các ứng dụng web hiện đại từ ý tưởng đến thực tế.",
-    en: "I build fast, elegant products with a strong focus on user experience, maintainable architecture, and real business impact. My sweet spot is shipping modern web apps from concept to production.",
+    vi: "Tôi thích biến mục tiêu sản phẩm thành trải nghiệm hoàn chỉnh, từ ý tưởng UX đến hệ thống backend bền vững. Mỗi dự án cân bằng giữa tốc độ, thẩm mỹ và khả năng bảo trì để đội ngũ phát triển tự tin.",
+    en: "I love turning product goals into complete experiences, from UX ideas to sustainable backend systems. Each project balances speed, aesthetics, and maintainability for the development team to be confident.",
   },
   email: "hello@minhanh.dev",
   githubUrl: "https://github.com",
   linkedinUrl: "https://linkedin.com",
   avatarUrl: FALLBACK_AVATAR_URL,
   cvUrl: "",
+  stats: {
+    years: "5+",
+    projects: "20+",
+    countries: "8",
+    reviews: "4.9/5",
+  },
 };
 
 export const defaultProjectsSeed: Array<Omit<PortfolioProject, "id">> = [

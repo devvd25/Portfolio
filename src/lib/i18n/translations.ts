@@ -153,7 +153,8 @@ const vi: TranslationDictionary = {
 
   "admin.profile.title": "Cập nhật profile",
   "admin.profile.field.fullName": "Họ và tên",
-  "admin.profile.field.headline": "Tiêu đề ngắn",
+  "admin.profile.field.headline": "Tiêu đề chính",
+  "admin.profile.field.role": "Vị trí/Vai trò",
   "admin.profile.field.location": "Địa điểm",
   "admin.profile.field.email": "Email",
   "admin.profile.field.bio": "Bio",
@@ -344,7 +345,8 @@ const en: TranslationDictionary = {
 
   "admin.profile.title": "Update profile",
   "admin.profile.field.fullName": "Full name",
-  "admin.profile.field.headline": "Short headline",
+  "admin.profile.field.headline": "Main headline",
+  "admin.profile.field.role": "Position/Role",
   "admin.profile.field.location": "Location",
   "admin.profile.field.email": "Email",
   "admin.profile.field.bio": "Bio",

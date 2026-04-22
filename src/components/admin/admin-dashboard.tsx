@@ -44,6 +44,7 @@ const emptyLocalizedString: LocalizedString = { vi: "", en: "" };
 const emptyProfileState: Omit<PortfolioProfile, "id"> = {
   fullName: "",
   headline: { ...emptyLocalizedString },
+  role: { ...emptyLocalizedString },
   location: { ...emptyLocalizedString },
   bio: { ...emptyLocalizedString },
   email: "",
@@ -51,6 +52,12 @@ const emptyProfileState: Omit<PortfolioProfile, "id"> = {
   linkedinUrl: "",
   avatarUrl: "",
   cvUrl: "",
+  stats: {
+    years: "",
+    projects: "",
+    countries: "",
+    reviews: "",
+  },
 };
 
 const emptyProjectState: ProjectFormState = {
@@ -116,6 +123,7 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
       setProfile({
         fullName: profileData.fullName,
         headline: profileData.headline,
+        role: profileData.role,
         location: profileData.location,
         bio: profileData.bio,
         email: profileData.email,
@@ -123,6 +131,7 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
         linkedinUrl: profileData.linkedinUrl,
         avatarUrl: profileData.avatarUrl,
         cvUrl: profileData.cvUrl,
+        stats: profileData.stats || emptyProfileState.stats,
       });
       setProjects(projectsData);
       setProjectForm((prev) => ({
@@ -827,6 +836,28 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
+              <Field label={`${t("admin.profile.field.role")} (VI)`}>
+                <Input
+                  required
+                  value={profile.role.vi}
+                  onChange={(event) =>
+                    setProfile((prev) => ({ ...prev, role: { ...prev.role, vi: event.target.value } }))
+                  }
+                />
+              </Field>
+
+              <Field label={`${t("admin.profile.field.role")} (EN)`}>
+                <Input
+                  required
+                  value={profile.role.en}
+                  onChange={(event) =>
+                    setProfile((prev) => ({ ...prev, role: { ...prev.role, en: event.target.value } }))
+                  }
+                />
+              </Field>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
               <Field label={`${t("admin.profile.field.location")} (VI)`}>
                 <Input
                   required
@@ -938,6 +969,41 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
                   />
                 </label>
               </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-4">
+              <Field label={t("portfolio.stats.years")}>
+                <Input
+                  value={profile.stats.years}
+                  onChange={(event) =>
+                    setProfile((prev) => ({ ...prev, stats: { ...prev.stats, years: event.target.value } }))
+                  }
+                />
+              </Field>
+              <Field label={t("portfolio.stats.projects")}>
+                <Input
+                  value={profile.stats.projects}
+                  onChange={(event) =>
+                    setProfile((prev) => ({ ...prev, stats: { ...prev.stats, projects: event.target.value } }))
+                  }
+                />
+              </Field>
+              <Field label={t("portfolio.stats.countries")}>
+                <Input
+                  value={profile.stats.countries}
+                  onChange={(event) =>
+                    setProfile((prev) => ({ ...prev, stats: { ...prev.stats, countries: event.target.value } }))
+                  }
+                />
+              </Field>
+              <Field label={t("portfolio.stats.reviews")}>
+                <Input
+                  value={profile.stats.reviews}
+                  onChange={(event) =>
+                    setProfile((prev) => ({ ...prev, stats: { ...prev.stats, reviews: event.target.value } }))
+                  }
+                />
+              </Field>
             </div>
 
             <Button type="submit" disabled={isSaving} className="w-full sm:w-auto">

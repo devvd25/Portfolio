@@ -9,6 +9,7 @@ export interface PortfolioProfile {
   id: string;
   fullName: string;
   headline: LocalizedString;
+  role: LocalizedString;
   location: LocalizedString;
   bio: LocalizedString;
   email: string;
@@ -16,6 +17,12 @@ export interface PortfolioProfile {
   linkedinUrl: string;
   avatarUrl: string;
   cvUrl: string;
+  stats: {
+    years: string;
+    projects: string;
+    countries: string;
+    reviews: string;
+  };
 }
 
 export interface PortfolioProject {
