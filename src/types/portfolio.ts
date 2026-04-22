@@ -33,6 +33,7 @@ export interface PortfolioProject {
   imageUrl: string;
   demoUrl: string;
   repoUrl: string;
+  featured: boolean;
   order: number;
   isHidden: boolean;
 }
