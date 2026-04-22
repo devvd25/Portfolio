@@ -77,6 +77,7 @@ function serializeProfile(profile: any): PortfolioProfile {
     id: String(profile._id),
     fullName: profile.fullName,
     headline: ensureLocalized(profile.headline),
+    role: ensureLocalized(profile.role),
     location: ensureLocalized(profile.location),
     bio: ensureLocalized(profile.bio),
     email: profile.email,
@@ -84,6 +85,12 @@ function serializeProfile(profile: any): PortfolioProfile {
     linkedinUrl: profile.linkedinUrl ?? "",
     avatarUrl: profile.avatarUrl || FALLBACK_AVATAR_URL,
     cvUrl: profile.cvUrl ?? "",
+    stats: profile.stats || {
+      years: "",
+      projects: "",
+      countries: "",
+      reviews: "",
+    },
   };
 }
 
