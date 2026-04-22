@@ -58,10 +58,13 @@ export async function POST(request: Request) {
 
     const isImage = file.type.startsWith("image/");
     const isPdf = file.type === "application/pdf";
+    const isWord = 
+      file.type === "application/msword" || 
+      file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
-    if (!isImage && !isPdf) {
+    if (!isImage && !isPdf && !isWord) {
       return NextResponse.json(
-        { message: "Chỉ cho phép upload hình ảnh hoặc file PDF." },
+        { message: "Chỉ cho phép upload hình ảnh, PDF hoặc file Word (.doc, .docx)." },
         { status: 400 },
       );
     }

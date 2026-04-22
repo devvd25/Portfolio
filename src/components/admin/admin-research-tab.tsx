@@ -1,8 +1,8 @@
 "use client";
 
 import { useLanguage } from "@/components/language-provider";
-import { Plus, Save, Trash2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { Plus, Save, Trash2, UploadCloud } from "lucide-react";
+import { useEffect, useMemo, useState, useRef } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,8 +14,10 @@ export function AdminResearchTab({ isAutoSaveEnabled = false }: { isAutoSaveEnab
   const [data, setData] = useState<PortfolioResearch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const emptyLocalizedString: LocalizedString = { vi: "", en: "" };
   const emptyForm = {
@@ -50,6 +52,37 @@ export function AdminResearchTab({ isAutoSaveEnabled = false }: { isAutoSaveEnab
       setNotice({ type: "error", message: t("admin.common.loadFailed") });
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function handleFileUpload(file: File) {
+    setIsUploading(true);
+    setNotice(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const payload = (await res.json()) as { message?: string };
+        throw new Error(payload.message || t("admin.notice.uploadFailed"));
+      }
+
+      const result = await res.json();
+      setForm((prev) => ({ ...prev, documentUrl: result.url }));
+      setNotice({ type: "success", message: t("admin.common.uploadSuccess") || "Upload thành công!" });
+    } catch (error) {
+      setNotice({ 
+        type: "error", 
+        message: error instanceof Error ? error.message : "Lỗi upload" 
+      });
+    } finally {
+      setIsUploading(false);
     }
   }
 
@@ -236,7 +269,37 @@ export function AdminResearchTab({ isAutoSaveEnabled = false }: { isAutoSaveEnab
 
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="text-sm font-semibold block">{t("admin.research.demoUrl")} <Input value={form.demoUrl} onChange={e => setForm({ ...form, demoUrl: e.target.value })} /></label>
-          <label className="text-sm font-semibold block">{t("admin.research.documentUrl")} <Input value={form.documentUrl} onChange={e => setForm({ ...form, documentUrl: e.target.value })} /></label>
+          <div className="space-y-2">
+            <label className="text-sm font-semibold block">{t("admin.research.documentUrl")} 
+              <div className="flex gap-2 mt-1">
+                <Input 
+                  value={form.documentUrl} 
+                  onChange={e => setForm({ ...form, documentUrl: e.target.value })} 
+                  className="flex-1"
+                />
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  className="hidden"
+                  ref={fileInputRef}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) void handleFileUpload(file);
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={isUploading}
+                  onClick={() => fileInputRef.current?.click()}
+                  className="shrink-0"
+                >
+                  <UploadCloud className="h-4 w-4 mr-2 text-sky-500" />
+                  {isUploading ? "..." : "Upload"}
+                </Button>
+              </div>
+            </label>
+          </div>
         </div>
 
         <Button type="submit" disabled={isSaving} className="w-full">
