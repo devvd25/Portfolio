@@ -22,7 +22,6 @@ const experienceSchema = new Schema(
     companyImageUrl: { type: String, default: "", trim: true },
     environmentImageUrl: { type: String, default: "", trim: true },
     order: { type: Number, required: true, min: 1, default: 1 },
-    type: { type: String, enum: ["work", "other"], default: "work" },
     isHidden: { type: Boolean, default: false },
   },
   { timestamps: true },

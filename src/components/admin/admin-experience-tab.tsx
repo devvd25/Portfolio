@@ -25,7 +25,6 @@ export function AdminExperienceTab({ isAutoSaveEnabled = false }: { isAutoSaveEn
     tasksTextEN: "",
     techStackText: "",
     order: 1,
-    type: "work" as "work" | "other",
     isHidden: false,
   };
   const [form, setForm] = useState(emptyForm);
@@ -72,7 +71,6 @@ export function AdminExperienceTab({ isAutoSaveEnabled = false }: { isAutoSaveEn
       tasks,
       techStack: form.techStackText.split(",").map(t => t.trim()).filter(Boolean),
       order: Number(form.order),
-      type: form.type,
       isHidden: form.isHidden,
     };
 
@@ -129,7 +127,6 @@ export function AdminExperienceTab({ isAutoSaveEnabled = false }: { isAutoSaveEn
         tasks,
         techStack: form.techStackText.split(",").map(t => t.trim()).filter(Boolean),
         order: Number(form.order),
-        type: form.type,
         isHidden: form.isHidden,
       };
       void saveData(editingId, finalPayload, true);
@@ -163,7 +160,6 @@ export function AdminExperienceTab({ isAutoSaveEnabled = false }: { isAutoSaveEn
       tasksTextEN: item.tasks.map(t => t.en).join("\n"),
       techStackText: item.techStack.join(", "),
       order: item.order,
-      type: item.type || "work",
       isHidden: item.isHidden || false,
     });
   }
@@ -175,7 +171,7 @@ export function AdminExperienceTab({ isAutoSaveEnabled = false }: { isAutoSaveEn
       <form onSubmit={handleSubmit} className="space-y-4 rounded-3xl border border-white/80 bg-gradient-to-br from-white to-[#f7ecdf] p-6 shadow-md dark:border-zinc-700 dark:from-zinc-900 dark:to-zinc-800">
         <div className="flex items-center justify-between gap-2">
           <h2 className="font-display text-2xl font-black text-zinc-900 dark:text-zinc-50">
-            {editingId ? t("admin.experience.editTitle") : t("admin.experience.add")}
+            {editingId ? "Sửa kinh nghiệm chuyên môn" : "Thêm kinh nghiệm chuyên môn"}
           </h2>
           {editingId && (
             <Button type="button" variant="outline" onClick={() => { setEditingId(null); setForm(emptyForm); }}>{t("admin.common.cancel")}</Button>
@@ -193,29 +189,16 @@ export function AdminExperienceTab({ isAutoSaveEnabled = false }: { isAutoSaveEn
           </label>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1">
-            <label className="text-sm font-semibold block">{t("admin.experience.type")}</label>
-            <select 
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-              value={form.type}
-              onChange={e => setForm({ ...form, type: e.target.value as any })}
-            >
-              <option value="work">{t("admin.experience.type.work")}</option>
-              <option value="other">{t("admin.experience.type.other")}</option>
-            </select>
-          </div>
-          <div className="flex items-end pb-2">
-            <label className="flex items-center gap-2 cursor-pointer text-sm font-semibold">
-              <input 
-                type="checkbox" 
-                checked={form.isHidden} 
-                onChange={e => setForm({ ...form, isHidden: e.target.checked })} 
-                className="h-4 w-4 rounded border-zinc-300 text-orange-500 focus:ring-orange-500"
-              />
-              {t("admin.experience.isHidden")}
-            </label>
-          </div>
+        <div className="flex items-end pb-2">
+          <label className="flex items-center gap-2 cursor-pointer text-sm font-semibold">
+            <input 
+              type="checkbox" 
+              checked={form.isHidden} 
+              onChange={e => setForm({ ...form, isHidden: e.target.checked })} 
+              className="h-4 w-4 rounded border-zinc-300 text-orange-500 focus:ring-orange-500"
+            />
+            {t("admin.experience.isHidden")}
+          </label>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -257,69 +240,28 @@ export function AdminExperienceTab({ isAutoSaveEnabled = false }: { isAutoSaveEn
 
       <div className="space-y-6 rounded-3xl border border-white/80 bg-gradient-to-br from-white to-[#f7ecdf] p-6 shadow-md dark:border-zinc-700 dark:from-zinc-900 dark:to-zinc-800">
         <h2 className="font-display text-2xl font-black text-zinc-900 dark:text-zinc-50">{t("admin.experience.list")}</h2>
-        
-        <div className="space-y-6">
-          {/* Work Experience Section */}
-          <div className="space-y-3">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-500 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-sky-500"></span>
-              {t("admin.experience.type.work")}
-            </h3>
-            <div className="space-y-2">
-              {sortedData.filter(item => (item.type || "work") === "work").length === 0 && (
-                <p className="text-xs text-zinc-400 italic py-2 px-4 border border-dashed border-zinc-200 rounded-xl">Chưa có kinh nghiệm làm việc.</p>
-              )}
-              {sortedData.filter(item => (item.type || "work") === "work").map(item => (
-                <article 
-                  key={item.id} 
-                  className={`rounded-2xl border border-zinc-200 bg-white/80 p-4 dark:border-zinc-700 dark:bg-zinc-900/70 flex justify-between items-center ${item.isHidden ? "opacity-50" : ""}`}
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      {item.isHidden && <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">HIDDEN</span>}
-                    </div>
-                    <h4 className="font-semibold truncate text-sm">{item.role[language]} @ {item.company}</h4>
-                    <p className="text-[10px] text-muted-foreground">{item.period[language]}</p>
-                  </div>
-                  <div className="flex gap-1 ml-4 shrink-0">
-                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => handleEdit(item)}><Pencil className="h-4 w-4" /></Button>
-                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-red-500" onClick={() => handleDelete(item.id)}><Trash2 className="h-4 w-4" /></Button>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-
-          {/* Other Experience Section */}
-          <div className="space-y-3 pt-4 border-t border-zinc-200/50">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-500 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-purple-500"></span>
-              {t("admin.experience.type.other")}
-            </h3>
-            <div className="space-y-2">
-              {sortedData.filter(item => item.type === "other").length === 0 && (
-                <p className="text-xs text-zinc-400 italic py-2 px-4 border border-dashed border-zinc-200 rounded-xl">Chưa có kinh nghiệm khác.</p>
-              )}
-              {sortedData.filter(item => item.type === "other").map(item => (
-                <article 
-                  key={item.id} 
-                  className={`rounded-2xl border border-zinc-200 bg-white/80 p-4 dark:border-zinc-700 dark:bg-zinc-900/70 flex justify-between items-center ${item.isHidden ? "opacity-50" : ""}`}
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      {item.isHidden && <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">HIDDEN</span>}
-                    </div>
-                    <h4 className="font-semibold truncate text-sm">{item.role[language]} @ {item.company}</h4>
-                    <p className="text-[10px] text-muted-foreground">{item.period[language]}</p>
-                  </div>
-                  <div className="flex gap-1 ml-4 shrink-0">
-                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => handleEdit(item)}><Pencil className="h-4 w-4" /></Button>
-                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-red-500" onClick={() => handleDelete(item.id)}><Trash2 className="h-4 w-4" /></Button>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
+        <div className="space-y-2">
+          {sortedData.length === 0 && (
+            <p className="text-xs text-zinc-400 italic py-2 px-4 border border-dashed border-zinc-200 rounded-xl">Chưa có kinh nghiệm làm việc.</p>
+          )}
+          {sortedData.map(item => (
+            <article 
+              key={item.id} 
+              className={`rounded-2xl border border-zinc-200 bg-white/80 p-4 dark:border-zinc-700 dark:bg-zinc-900/70 flex justify-between items-center ${item.isHidden ? "opacity-50" : ""}`}
+            >
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  {item.isHidden && <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">HIDDEN</span>}
+                </div>
+                <h4 className="font-semibold truncate text-sm">{item.role[language]} @ {item.company}</h4>
+                <p className="text-[10px] text-muted-foreground">{item.period[language]}</p>
+              </div>
+              <div className="flex gap-1 ml-4 shrink-0">
+                <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => handleEdit(item)}><Pencil className="h-4 w-4" /></Button>
+                <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-red-500" onClick={() => handleDelete(item.id)}><Trash2 className="h-4 w-4" /></Button>
+              </div>
+            </article>
+          ))}
         </div>
       </div>
     </div>
