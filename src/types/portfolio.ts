@@ -53,6 +53,8 @@ export interface PortfolioExperience {
   companyImageUrl: string;
   environmentImageUrl: string;
   order: number;
+  type: "work" | "other";
+  isHidden: boolean;
 }
 
 export interface PortfolioActivity {

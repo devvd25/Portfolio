@@ -185,6 +185,10 @@ const vi: TranslationDictionary = {
   "admin.experience.techStack": "Tech Stack (cách nhau bởi dấu phẩy)",
   "admin.experience.tasks": "Nhiệm vụ (mỗi dòng một nhiệm vụ)",
   "admin.experience.list": "Danh sách kinh nghiệm",
+  "admin.experience.type": "Loại kinh nghiệm",
+  "admin.experience.type.work": "Kinh nghiệm làm việc",
+  "admin.experience.type.other": "Kinh nghiệm khác",
+  "admin.experience.isHidden": "Ẩn mục này",
 
   "admin.activities.add": "Thêm hoạt động",
   "admin.activities.editTitle": "Sửa hoạt động",
@@ -376,7 +380,11 @@ const en: TranslationDictionary = {
   "admin.experience.order": "Order",
   "admin.experience.techStack": "Tech Stack (comma separated)",
   "admin.experience.tasks": "Tasks (one per line)",
-  "admin.experience.list": "Experience List",
+  "admin.experience.list": "Experience list",
+  "admin.experience.type": "Experience type",
+  "admin.experience.type.work": "Work experience",
+  "admin.experience.type.other": "Other experience",
+  "admin.experience.isHidden": "Hide this item",
 
   "admin.activities.add": "Add Activity",
   "admin.activities.editTitle": "Edit Activity",

@@ -119,6 +119,8 @@ function serializeExperience(doc: any): PortfolioExperience {
     companyImageUrl: doc.companyImageUrl ?? "",
     environmentImageUrl: doc.environmentImageUrl ?? "",
     order: doc.order,
+    type: doc.type || "work",
+    isHidden: Boolean(doc.isHidden),
   };
 }
 

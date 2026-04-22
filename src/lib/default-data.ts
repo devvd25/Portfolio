@@ -170,6 +170,8 @@ export const defaultExperienceSeed: Array<Omit<PortfolioExperience, "id">> = [
     companyImageUrl: "/activities/ikigai-company.jpg",
     environmentImageUrl: "/activities/ikigai-environment.jpg",
     order: 1,
+    type: "work",
+    isHidden: false,
   }
 ];
 

@@ -58,6 +58,8 @@ export const experienceSchema = z.object({
   companyImageUrl: optionalHttpUrl,
   environmentImageUrl: optionalHttpUrl,
   order: z.number().int().min(1).optional(),
+  type: z.enum(["work", "other"]).default("work"),
+  isHidden: z.boolean().default(false),
 });
 
 export const activitySchema = z.object({
