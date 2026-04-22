@@ -24,6 +24,7 @@ import type {
   PortfolioProject,
   SkillCategory,
   PortfolioExperience,
+  PortfolioOtherExperience,
   PortfolioActivity,
   PortfolioResearch,
 } from "@/types/portfolio";
@@ -33,6 +34,7 @@ interface PortfolioPageProps {
   projects: PortfolioProject[];
   skills: SkillCategory[];
   experience: PortfolioExperience[];
+  otherExperience: PortfolioOtherExperience[];
   activities: PortfolioActivity[];
   research: PortfolioResearch[];
 }
@@ -44,7 +46,7 @@ const sectionMotion = {
   transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
 } as const;
 
-export function PortfolioPage({ profile, projects, skills, experience, activities, research }: PortfolioPageProps) {
+export function PortfolioPage({ profile, projects, skills, experience, otherExperience, activities, research }: PortfolioPageProps) {
   const { t, language } = useLanguage();
 
   return (
@@ -138,7 +140,7 @@ export function PortfolioPage({ profile, projects, skills, experience, activitie
           </div>
         </motion.section>
 
-        <ExperienceSection experience={experience} />
+        <ExperienceSection experience={experience} otherExperience={otherExperience} />
 
         <motion.section id="skills" {...sectionMotion} className="space-y-8 py-20">
           <div className="space-y-4 text-center">

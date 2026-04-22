@@ -57,6 +57,16 @@ export interface PortfolioExperience {
   isHidden: boolean;
 }
 
+export interface PortfolioOtherExperience {
+  id: string;
+  title: LocalizedString;
+  description: LocalizedString;
+  period: LocalizedString;
+  imageUrl?: string;
+  order: number;
+  isHidden: boolean;
+}
+
 export interface PortfolioActivity {
   id: string;
   title: LocalizedString;

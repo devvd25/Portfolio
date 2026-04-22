@@ -11,10 +11,12 @@ import { ProjectModel } from "@/models/Project";
 import { ExperienceModel } from "@/models/Experience";
 import { ActivityModel } from "@/models/Activity";
 import { ResearchModel } from "@/models/Research";
+import { OtherExperienceModel } from "@/models/OtherExperience";
 import type { 
   PortfolioProfile, 
   PortfolioProject,
   PortfolioExperience,
+  PortfolioOtherExperience,
   PortfolioActivity,
   PortfolioResearch,
   LocalizedString,
@@ -56,6 +58,10 @@ function buildLocalExperience(): PortfolioExperience[] {
     id: `local-exp-${index + 1}`,
     ...exp,
   }));
+}
+
+function buildLocalOtherExperience(): PortfolioOtherExperience[] {
+  return []; // No default seeds for other experience yet
 }
 
 function buildLocalActivities(): PortfolioActivity[] {
@@ -124,6 +130,18 @@ function serializeExperience(doc: any): PortfolioExperience {
   };
 }
 
+function serializeOtherExperience(doc: any): PortfolioOtherExperience {
+  return {
+    id: String(doc._id),
+    title: ensureLocalized(doc.title),
+    description: ensureLocalized(doc.description),
+    period: ensureLocalized(doc.period),
+    imageUrl: doc.imageUrl ?? "",
+    order: doc.order,
+    isHidden: Boolean(doc.isHidden),
+  };
+}
+
 function serializeActivity(doc: any): PortfolioActivity {
   return {
     id: String(doc._id),
@@ -182,6 +200,7 @@ export async function getPortfolioSnapshot() {
       profile: buildLocalProfile(),
       projects: buildLocalProjects(),
       experience: buildLocalExperience(),
+      otherExperience: buildLocalOtherExperience(),
       activities: buildLocalActivities(),
       research: buildLocalResearch(),
       source: "fallback" as const,
@@ -191,10 +210,11 @@ export async function getPortfolioSnapshot() {
   try {
     await ensureSeedData();
 
-    const [profileDoc, projectDocs, expDocs, actDocs, resDocs] = await Promise.all([
+    const [profileDoc, projectDocs, expDocs, otherExpDocs, actDocs, resDocs] = await Promise.all([
       PortfolioProfileModel.findOne({ key: "main" }).lean(),
       ProjectModel.find().sort({ order: 1, createdAt: -1 }).lean(),
       ExperienceModel.find().sort({ order: 1 }).lean(),
+      OtherExperienceModel.find().sort({ order: 1 }).lean(),
       ActivityModel.find().sort({ category: 1, order: 1 }).lean(),
       ResearchModel.find().sort({ order: 1 }).lean(),
     ]);
@@ -204,6 +224,7 @@ export async function getPortfolioSnapshot() {
         profile: buildLocalProfile(),
         projects: buildLocalProjects(),
         experience: buildLocalExperience(),
+        otherExperience: buildLocalOtherExperience(),
         activities: buildLocalActivities(),
         research: buildLocalResearch(),
         source: "fallback" as const,
@@ -214,6 +235,7 @@ export async function getPortfolioSnapshot() {
       profile: serializeProfile(profileDoc),
       projects: projectDocs.map(serializeProject),
       experience: expDocs.map(serializeExperience),
+      otherExperience: otherExpDocs.map(serializeOtherExperience),
       activities: actDocs.map(serializeActivity),
       research: resDocs.map(serializeResearch),
       source: "database" as const,

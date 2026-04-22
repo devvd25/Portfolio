@@ -5,7 +5,7 @@ import { getPortfolioSnapshot } from "@/lib/portfolio-data";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const { profile, projects, experience, activities, research } = await getPortfolioSnapshot();
+  const { profile, projects, experience, otherExperience, activities, research } = await getPortfolioSnapshot();
 
   return (
     <PortfolioPage 
@@ -13,6 +13,7 @@ export default async function Home() {
       projects={projects} 
       skills={defaultSkills} 
       experience={experience}
+      otherExperience={otherExperience}
       activities={activities}
       research={research}
     />

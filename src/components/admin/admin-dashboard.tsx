@@ -14,6 +14,7 @@ import { parseStackInput } from "@/lib/validators";
 import type { PortfolioProfile, PortfolioProject, LocalizedString } from "@/types/portfolio";
 
 import { AdminExperienceTab } from "./admin-experience-tab";
+import { AdminOtherExperienceTab } from "./admin-other-experience-tab";
 import { AdminActivitiesTab } from "./admin-activities-tab";
 import { AdminResearchTab } from "./admin-research-tab";
 
@@ -76,7 +77,7 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
   const { t, language } = useLanguage();
 
   const [activeTab, setActiveTab] = useState<
-    "projects" | "profile" | "experience" | "activities" | "research"
+    "projects" | "profile" | "experience" | "otherExperience" | "activities" | "research"
   >("projects");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -522,6 +523,12 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
             {t("admin.tab.experience")}
           </Button>
           <Button
+            variant={activeTab === "otherExperience" ? "default" : "outline"}
+            onClick={() => setActiveTab("otherExperience")}
+          >
+            {t("admin.tab.otherExperience") || "Kinh nghiệm khác"}
+          </Button>
+          <Button
             variant={activeTab === "projects" ? "default" : "outline"}
             onClick={() => setActiveTab("projects")}
           >
@@ -540,6 +547,8 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
             {t("admin.tab.research")}
           </Button>
         </div>
+
+        {!isLoading && activeTab === "otherExperience" && <AdminOtherExperienceTab isAutoSaveEnabled={isAutoSaveEnabled} />}
 
         {isLoading ? (
           <div className="rounded-3xl border border-zinc-200 bg-white/80 p-6 text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900/70 dark:text-zinc-300">
