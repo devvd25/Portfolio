@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, Plus, Save, Trash2, UploadCloud, User, Briefcase, Star, Layout, MessageSquare, BookOpen } from "lucide-react";
+import { LogOut, Plus, Save, Trash2, UploadCloud, User, Briefcase, Star, Layout, MessageSquare, BookOpen, Pencil, ImageIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -38,6 +38,7 @@ interface ProjectFormState {
   repoUrl: string;
   featured: boolean;
   order: number;
+  isHidden: boolean;
 }
 
 const emptyLocalizedString: LocalizedString = { vi: "", en: "" };
@@ -70,6 +71,7 @@ const emptyProjectState: ProjectFormState = {
   repoUrl: "",
   featured: false,
   order: 1,
+  isHidden: false,
 };
 
 export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
@@ -106,44 +108,23 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
 
   async function loadDashboardData() {
     setIsLoading(true);
-    setNotice(null);
-
     try {
-      const [profileResponse, projectsResponse] = await Promise.all([
+      const [profileRes, projectsRes] = await Promise.all([
         fetch("/api/profile", { cache: "no-store" }),
         fetch("/api/projects", { cache: "no-store" }),
       ]);
 
-      if (!profileResponse.ok || !projectsResponse.ok) {
-        throw new Error("load_failed");
+      if (profileRes.ok) {
+        const profileData = await profileRes.json();
+        setProfile(profileData);
       }
-
-      const profileData = (await profileResponse.json()) as PortfolioProfile;
-      const projectsData = (await projectsResponse.json()) as PortfolioProject[];
-
-      setProfile({
-        fullName: profileData.fullName,
-        headline: profileData.headline,
-        role: profileData.role,
-        location: profileData.location,
-        bio: profileData.bio,
-        email: profileData.email,
-        githubUrl: profileData.githubUrl,
-        linkedinUrl: profileData.linkedinUrl,
-        avatarUrl: profileData.avatarUrl,
-        cvUrl: profileData.cvUrl,
-        stats: profileData.stats || emptyProfileState.stats,
-      });
-      setProjects(projectsData);
-      setProjectForm((prev) => ({
-        ...prev,
-        order: Math.max(1, projectsData.length + 1),
-      }));
-    } catch {
-      setNotice({
-        type: "error",
-        message: t("admin.notice.loadDashboardFailed"),
-      });
+      if (projectsRes.ok) {
+        const projectsData = await projectsRes.json();
+        setProjects(projectsData);
+        setProjectForm(prev => ({ ...prev, order: projectsData.length + 1 }));
+      }
+    } catch (error) {
+      console.error("Dashboard load error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -205,7 +186,10 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
       if (!silent) {
         setNotice({ type: "success", message: projectId ? t("admin.notice.projectUpdated") : t("admin.notice.projectCreated") });
         if (!projectId) {
-          setProjectForm({ ...emptyProjectState, order: Math.max(1, projects.length + 1) });
+          setProjectForm({ ...emptyProjectState, order: projects.length + 1 });
+        } else {
+          setEditingProjectId(null);
+          setProjectForm({ ...emptyProjectState, order: projects.length + 1 });
         }
         await loadDashboardData();
       }
@@ -253,6 +237,23 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
       if (!res.ok) throw new Error();
       const { url } = await res.json();
       setProfile(prev => ({ ...prev, [field]: url }));
+      setNotice({ type: "success", message: t("admin.notice.uploaded") });
+    } catch {
+      setNotice({ type: "error", message: t("admin.notice.uploadError") });
+    } finally {
+      setIsUploading(false);
+    }
+  }
+
+  async function handleProjectImageUpload(file: File) {
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      if (!res.ok) throw new Error();
+      const { url } = await res.json();
+      setProjectForm(prev => ({ ...prev, imageUrl: url }));
       setNotice({ type: "success", message: t("admin.notice.uploaded") });
     } catch {
       setNotice({ type: "error", message: t("admin.notice.uploadError") });
@@ -357,25 +358,91 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
             {activeTab === "research" && <AdminResearchTab isAutoSaveEnabled={isAutoSaveEnabled} />}
             
             {activeTab === "projects" && (
-              <div className="grid gap-6 lg:grid-cols-2">
+              <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
                 <form onSubmit={handleProjectSubmit} className="space-y-4 rounded-3xl border border-white/80 bg-white/40 p-8 shadow-lg dark:bg-zinc-900/40">
-                  <h2 className="text-2xl font-black">{editingProjectId ? "Sửa dự án" : "Thêm dự án"}</h2>
-                  <Field label="Tên dự án (VI)"><Input required value={projectForm.title.vi} onChange={e => setProjectForm({...projectForm, title: {...projectForm.title, vi: e.target.value}})} /></Field>
-                  <Field label="Mô tả (VI)"><Textarea required value={projectForm.summary.vi} onChange={e => setProjectForm({...projectForm, summary: {...projectForm.summary, vi: e.target.value}})} /></Field>
-                  <Field label="Công nghệ (Cách nhau bằng dấu phẩy)"><Input required value={projectForm.stackText} onChange={e => setProjectForm({...projectForm, stackText: e.target.value})} /></Field>
-                  <Button type="submit" disabled={isSaving} className="w-full h-12 rounded-2xl"><Plus className="h-4 w-4 mr-2" /> {editingProjectId ? "Lưu cập nhật" : "Tạo mới"}</Button>
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-black">{editingProjectId ? "Sửa dự án" : "Thêm dự án mới"}</h2>
+                    {editingProjectId && (
+                      <Button type="button" variant="ghost" onClick={() => { setEditingProjectId(null); setProjectForm(emptyProjectState); }}>Hủy bỏ</Button>
+                    )}
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field label="Tên dự án (VI)"><Input required value={projectForm.title.vi} onChange={e => setProjectForm({...projectForm, title: {...projectForm.title, vi: e.target.value}})} /></Field>
+                    <Field label="Tên dự án (EN)"><Input required value={projectForm.title.en} onChange={e => setProjectForm({...projectForm, title: {...projectForm.title, en: e.target.value}})} /></Field>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field label="Mô tả tóm tắt (VI)"><Textarea required rows={3} value={projectForm.summary.vi} onChange={e => setProjectForm({...projectForm, summary: {...projectForm.summary, vi: e.target.value}})} /></Field>
+                    <Field label="Mô tả tóm tắt (EN)"><Textarea required rows={3} value={projectForm.summary.en} onChange={e => setProjectForm({...projectForm, summary: {...projectForm.summary, en: e.target.value}})} /></Field>
+                  </div>
+
+                  <Field label="Công nghệ (Cách nhau bằng dấu phẩy, VD: React, Tailwind, Node.js)">
+                    <Input required value={projectForm.stackText} onChange={e => setProjectForm({...projectForm, stackText: e.target.value})} placeholder="React, Node.js, ..." />
+                  </Field>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field label="Demo URL"><Input value={projectForm.demoUrl} onChange={e => setProjectForm({...projectForm, demoUrl: e.target.value})} placeholder="https://..." /></Field>
+                    <Field label="Repo URL"><Input value={projectForm.repoUrl} onChange={e => setProjectForm({...projectForm, repoUrl: e.target.value})} placeholder="https://github.com/..." /></Field>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field label="Hình ảnh dự án (URL hoặc Upload)">
+                      <div className="flex gap-2">
+                        <Input value={projectForm.imageUrl} onChange={e => setProjectForm({...projectForm, imageUrl: e.target.value})} placeholder="https://..." />
+                        <label className="cursor-pointer bg-sky-500 text-white px-3 py-2 rounded-xl flex items-center shrink-0 hover:bg-sky-600 transition-colors">
+                          <UploadCloud className="h-4 w-4" />
+                          <input type="file" className="hidden" accept="image/*" onChange={e => e.target.files?.[0] && handleProjectImageUpload(e.target.files[0])} />
+                        </label>
+                      </div>
+                    </Field>
+                    <Field label="Thứ tự hiển thị"><Input type="number" required value={projectForm.order} onChange={e => setProjectForm({...projectForm, order: Number(e.target.value)})} /></Field>
+                  </div>
+
+                  <div className="flex gap-6 pt-2">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="checkbox" checked={projectForm.featured} onChange={e => setProjectForm({...projectForm, featured: e.target.checked})} className="h-4 w-4 rounded border-zinc-300" />
+                      <span className="text-sm font-bold">Dự án nổi bật</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="checkbox" checked={projectForm.isHidden} onChange={e => setProjectForm({...projectForm, isHidden: e.target.checked})} className="h-4 w-4 rounded border-zinc-300" />
+                      <span className="text-sm font-bold text-red-500">Ẩn dự án này</span>
+                    </label>
+                  </div>
+
+                  <Button type="submit" disabled={isSaving} className="w-full h-12 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-lg shadow-lg shadow-orange-500/20">
+                    {editingProjectId ? <Save className="h-5 w-5 mr-2" /> : <Plus className="h-5 w-5 mr-2" />}
+                    {editingProjectId ? "Lưu cập nhật dự án" : "Tạo mới dự án"}
+                  </Button>
                 </form>
+
                 <div className="space-y-4 rounded-3xl border border-white/80 bg-white/40 p-8 shadow-lg dark:bg-zinc-900/40">
                   <h2 className="text-2xl font-black">Danh sách dự án</h2>
-                  {projects.map(p => (
-                    <div key={p.id} className="flex justify-between items-center p-4 bg-white/80 dark:bg-zinc-800 rounded-2xl border border-zinc-100 dark:border-zinc-700">
-                      <span className="font-bold">{p.title[language]}</span>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="ghost" onClick={() => { setEditingProjectId(p.id); setProjectForm({ ...p, stackText: p.stack.join(", ") }); }}><Pencil className="h-4 w-4" /></Button>
-                        <Button size="sm" variant="ghost" className="text-red-500" onClick={() => handleDeleteProject(p.id)}><Trash2 className="h-4 w-4" /></Button>
+                  <div className="space-y-3">
+                    {sortedProjects.map(p => (
+                      <div key={p.id} className={`flex justify-between items-center p-4 bg-white/80 dark:bg-zinc-800 rounded-2xl border ${p.isHidden ? "border-red-200 opacity-60" : "border-zinc-100 dark:border-zinc-700"}`}>
+                        <div className="flex items-center gap-3">
+                          {p.imageUrl ? (
+                            <img src={p.imageUrl} className="h-10 w-10 rounded-lg object-cover" alt="" />
+                          ) : (
+                            <div className="h-10 w-10 rounded-lg bg-zinc-100 dark:bg-zinc-700 flex items-center justify-center"><ImageIcon className="h-5 w-5 text-zinc-400" /></div>
+                          )}
+                          <div>
+                            <p className="font-bold text-zinc-900 dark:text-zinc-100">{p.title[language]}</p>
+                            <div className="flex gap-2">
+                              {p.featured && <span className="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-md font-bold uppercase">Featured</span>}
+                              <span className="text-[10px] text-zinc-400 font-medium">#{p.order}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex gap-1">
+                          <Button size="sm" variant="ghost" className="text-sky-500" onClick={() => { setEditingProjectId(p.id); setProjectForm({ ...p, stackText: p.stack.join(", ") }); }}><Pencil className="h-4 w-4" /></Button>
+                          <Button size="sm" variant="ghost" className="text-red-500" onClick={() => handleDeleteProject(p.id)}><Trash2 className="h-4 w-4" /></Button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                    {projects.length === 0 && <p className="text-center text-zinc-400 italic py-8">Chưa có dự án nào.</p>}
+                  </div>
                 </div>
               </div>
             )}
@@ -392,14 +459,5 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <span>{label}</span>
       {children}
     </label>
-  );
-}
-
-function Pencil({ className }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
-      <path d="m15 5 4 4"/>
-    </svg>
   );
 }
