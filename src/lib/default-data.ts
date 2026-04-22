@@ -42,62 +42,7 @@ export const defaultProfileSeed: Omit<PortfolioProfile, "id"> = {
   },
 };
 
-export const defaultProjectsSeed: Array<Omit<PortfolioProject, "id">> = [
-  {
-    title: {
-      vi: "PetSphere Studio",
-      en: "PetSphere Studio",
-    },
-    summary: {
-      vi: "Một nền tảng đặt chỗ cao cấp cho các dịch vụ thú cưng với giao diện lấy cảm hứng từ đất sét, bảng điều khiển phân quyền và tích hợp thanh toán.",
-      en: "A premium booking platform for pet services with an expressive clay-inspired interface, role-based dashboards, and payment integration.",
-    },
-    stack: ["Next.js", "TypeScript", "Tailwind", "MongoDB"],
-    imageUrl:
-      "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=80",
-    demoUrl: "https://example.vercel.app",
-    repoUrl: "https://github.com",
-    featured: true,
-    order: 1,
-    isHidden: false,
-  },
-  {
-    title: {
-      vi: "InsightBoard Analytics",
-      en: "InsightBoard Analytics",
-    },
-    summary: {
-      vi: "Bảng điều khiển nhóm thời gian thực cho các chỉ số sản phẩm và tăng trưởng, kết hợp dữ liệu trực tiếp, ghi chú cộng tác và trình tạo báo cáo tùy chỉnh.",
-      en: "A real-time team dashboard for product and growth metrics, combining streaming data, collaborative notes, and custom report builders.",
-    },
-    stack: ["Next.js", "Node.js", "Socket.IO", "MongoDB"],
-    imageUrl:
-      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80",
-    demoUrl: "https://example.vercel.app",
-    repoUrl: "https://github.com",
-    featured: true,
-    order: 2,
-    isHidden: false,
-  },
-  {
-    title: {
-      vi: "Orbit Commerce",
-      en: "Orbit Commerce",
-    },
-    summary: {
-      vi: "Trải nghiệm thương mại điện tử với đề xuất cá nhân hóa, công cụ quản trị mạnh mẽ và quy trình thanh toán tối ưu chuyển đổi.",
-      en: "An ecommerce experience with personalized recommendations, robust admin tools, and conversion-first checkout journeys.",
-    },
-    stack: ["React", "Tailwind", "Node.js", "MongoDB"],
-    imageUrl:
-      "https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1200&q=80",
-    demoUrl: "https://example.vercel.app",
-    repoUrl: "https://github.com",
-    featured: false,
-    order: 3,
-    isHidden: false,
-  },
-];
+export const defaultProjectsSeed: Array<Omit<PortfolioProject, "id">> = [];
 
 export const defaultSkills: SkillCategory[] = [
   {
