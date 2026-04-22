@@ -33,8 +33,8 @@ export interface PortfolioProject {
   imageUrl: string;
   demoUrl: string;
   repoUrl: string;
-  featured: boolean;
   order: number;
+  isHidden: boolean;
 }
 
 export interface SkillCategory {
@@ -71,7 +71,8 @@ export interface PortfolioActivity {
   title: LocalizedString;
   description: LocalizedString;
   imageUrl: string;
-  category: "community" | "workshop";
+  category: "community" | "workshop" | "qualification";
+  date?: string;
   order: number;
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/components/language-provider";
-import { Plus, Save, Trash2, UploadCloud } from "lucide-react";
+import { Plus, Save, Trash2, UploadCloud, Pencil, Image as ImageIcon } from "lucide-react";
 import { useEffect, useMemo, useState, useRef } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,8 @@ export function AdminActivitiesTab({ isAutoSaveEnabled = false }: { isAutoSaveEn
     title: { ...emptyLocalizedString },
     description: { ...emptyLocalizedString },
     imageUrl: "",
-    category: "community" as "community" | "workshop",
+    category: "community" as "community" | "workshop" | "qualification",
+    date: "",
     order: 1,
   };
   const [form, setForm] = useState(emptyForm);
@@ -151,18 +152,28 @@ export function AdminActivitiesTab({ isAutoSaveEnabled = false }: { isAutoSaveEn
       description: item.description,
       imageUrl: item.imageUrl,
       category: item.category,
+      date: item.date || "",
       order: item.order,
     });
+  }
+
+  function getCategoryLabel(cat: string) {
+    switch (cat) {
+      case "community": return "Hoạt động cộng đồng/Community Service";
+      case "workshop": return "Hội thảo, khóa học/Workshops and Courses";
+      case "qualification": return "Giáo dục, bằng cấp/Education and Qualifications";
+      default: return cat;
+    }
   }
 
   if (isLoading) return <div className="p-6 text-sm">{t("admin.common.loading")}</div>;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+    <div className="space-y-6">
       <form onSubmit={handleSubmit} className="space-y-4 rounded-3xl border border-white/80 bg-gradient-to-br from-white to-[#f7ecdf] p-6 shadow-md dark:border-zinc-700 dark:from-zinc-900 dark:to-zinc-800">
         <div className="flex items-center justify-between gap-2">
           <h2 className="font-display text-2xl font-black text-zinc-900 dark:text-zinc-50">
-            {editingId ? t("admin.activities.editTitle") : t("admin.activities.add")}
+            {editingId ? "Cập nhật Hoạt động / Bằng cấp" : "Thêm Hoạt động / Bằng cấp mới"}
           </h2>
           {editingId && (
             <Button type="button" variant="outline" onClick={() => { setEditingId(null); setForm(emptyForm); }}>{t("admin.common.cancel")}</Button>
@@ -172,39 +183,43 @@ export function AdminActivitiesTab({ isAutoSaveEnabled = false }: { isAutoSaveEn
         {notice && <div className={`p-3 text-sm rounded ${notice.type === "success" ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}>{notice.message}</div>}
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="text-sm font-semibold block">{t("admin.activities.title")} (VI)
+          <label className="text-sm font-semibold block">Tiêu đề / Tên chứng chỉ (VI)
             <Input required value={form.title.vi} onChange={e => setForm({ ...form, title: { ...form.title, vi: e.target.value } })} />
           </label>
-          <label className="text-sm font-semibold block">{t("admin.activities.title")} (EN)
+          <label className="text-sm font-semibold block">Tiêu đề / Tên chứng chỉ (EN)
             <Input required value={form.title.en} onChange={e => setForm({ ...form, title: { ...form.title, en: e.target.value } })} />
           </label>
         </div>
         
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="text-sm font-semibold block">{t("admin.activities.description")} (VI)
+          <label className="text-sm font-semibold block">Mô tả chi tiết (VI)
             <Textarea required rows={3} value={form.description.vi} onChange={e => setForm({ ...form, description: { ...form.description, vi: e.target.value } })} />
           </label>
-          <label className="text-sm font-semibold block">{t("admin.activities.description")} (EN)
+          <label className="text-sm font-semibold block">Mô tả chi tiết (EN)
             <Textarea required rows={3} value={form.description.en} onChange={e => setForm({ ...form, description: { ...form.description, en: e.target.value } })} />
           </label>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="text-sm font-semibold">{t("admin.activities.category")} 
+        <div className="grid gap-4 sm:grid-cols-3">
+          <label className="text-sm font-semibold">Danh mục
             <select 
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm mt-1"
               value={form.category} 
-              onChange={e => setForm({ ...form, category: e.target.value as "community" | "workshop" })}
+              onChange={e => setForm({ ...form, category: e.target.value as any })}
             >
-              <option value="community">{t("admin.activities.category.community")}</option>
-              <option value="workshop">{t("admin.activities.category.workshop")}</option>
+              <option value="community">Hoạt động cộng đồng</option>
+              <option value="workshop">Hội thảo & Workshop</option>
+              <option value="qualification">Bằng cấp & Chứng chỉ</option>
             </select>
           </label>
-          <label className="text-sm font-semibold">{t("admin.experience.order")} <Input type="number" required value={form.order} onChange={e => setForm({ ...form, order: Number(e.target.value) })} className="mt-1" /></label>
+          <label className="text-sm font-semibold">Ngày tháng (Ví dụ: 16/04/2026)
+            <Input value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} className="mt-1" placeholder="16/04/2026" />
+          </label>
+          <label className="text-sm font-semibold">Thứ tự hiển thị <Input type="number" required value={form.order} onChange={e => setForm({ ...form, order: Number(e.target.value) })} className="mt-1" /></label>
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-semibold block">{t("admin.activities.imageUrl")} 
+          <label className="text-sm font-semibold block">Hình ảnh (Chứng chỉ / Hoạt động)
             <div className="flex gap-2 mt-1">
               <Input 
                 value={form.imageUrl} 
@@ -235,27 +250,72 @@ export function AdminActivitiesTab({ isAutoSaveEnabled = false }: { isAutoSaveEn
           </label>
         </div>
 
-        <Button type="submit" disabled={isSaving} className="w-full">
-          {editingId ? <Save className="h-4 w-4 mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
-          {editingId ? t("admin.common.update") : t("admin.common.create")}
+        <Button type="submit" disabled={isSaving} className="w-full h-12 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-lg shadow-lg shadow-orange-500/20">
+          {editingId ? <Save className="h-5 w-5 mr-2" /> : <Plus className="h-5 w-5 mr-2" />}
+          {editingId ? "Cập nhật dữ liệu" : "Tạo mới mục này"}
         </Button>
       </form>
 
-      <div className="space-y-4 rounded-3xl border border-white/80 bg-gradient-to-br from-white to-[#f7ecdf] p-6 shadow-md dark:border-zinc-700 dark:from-zinc-900 dark:to-zinc-800">
-        <h2 className="font-display text-2xl font-black text-zinc-900 dark:text-zinc-50">{t("admin.activities.list")}</h2>
-        <div className="space-y-3">
-          {sortedData.map(item => (
-            <article key={item.id} className="rounded-2xl border border-zinc-200 bg-white/80 p-4 dark:border-zinc-700 dark:bg-zinc-900/70 flex justify-between">
-              <div>
-                <h3 className="font-semibold">{item.title[language]}</h3>
-                <p className="text-xs text-muted-foreground uppercase">{item.category}</p>
-              </div>
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => handleEdit(item)}>{t("admin.common.edit")}</Button>
-                <Button size="sm" variant="outline" onClick={() => handleDelete(item.id)}><Trash2 className="h-4 w-4 text-red-500" /></Button>
-              </div>
-            </article>
-          ))}
+      <div className="rounded-3xl border border-white/80 bg-white p-6 shadow-xl dark:border-zinc-700 dark:bg-zinc-900 overflow-hidden">
+        <h2 className="font-display text-2xl font-black text-red-600 mb-6">Danh sách bằng cấp, chứng chỉ và hoạt động</h2>
+        
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-zinc-100 dark:border-zinc-800">
+                <th className="py-4 px-2 text-sm font-black text-zinc-900 dark:text-zinc-50 w-12">Stt</th>
+                <th className="py-4 px-2 text-sm font-black text-zinc-900 dark:text-zinc-50 w-24">Hình ảnh</th>
+                <th className="py-4 px-2 text-sm font-black text-zinc-900 dark:text-zinc-50 w-1/4">Danh mục</th>
+                <th className="py-4 px-2 text-sm font-black text-zinc-900 dark:text-zinc-50">Mô tả</th>
+                <th className="py-4 px-2 text-sm font-black text-zinc-900 dark:text-zinc-50 w-32">Ngày</th>
+                <th className="py-4 px-2 text-sm font-black text-zinc-900 dark:text-zinc-50 text-right w-24">Hành động</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-50 dark:divide-zinc-800/50">
+              {sortedData.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-zinc-400 italic">Chưa có dữ liệu nào.</td>
+                </tr>
+              )}
+              {sortedData.map((item, index) => (
+                <tr key={item.id} className="group hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors">
+                  <td className="py-4 px-2 text-sm text-zinc-600 dark:text-zinc-400">{item.order}</td>
+                  <td className="py-4 px-2">
+                    {item.imageUrl ? (
+                      <div className="relative h-12 w-16 overflow-hidden rounded-lg border border-zinc-100 dark:border-zinc-800">
+                        <img src={item.imageUrl} alt="" className="h-full w-full object-cover" />
+                      </div>
+                    ) : (
+                      <div className="flex h-12 w-16 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
+                        <ImageIcon className="h-5 w-5 text-zinc-300" />
+                      </div>
+                    )}
+                  </td>
+                  <td className="py-4 px-2">
+                    <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">{getCategoryLabel(item.category)}</p>
+                  </td>
+                  <td className="py-4 px-2">
+                    <div className="space-y-1">
+                      <p className="text-sm font-bold text-zinc-900 dark:text-zinc-50">{item.title.vi}</p>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2">{item.description.vi}</p>
+                    </div>
+                  </td>
+                  <td className="py-4 px-2 text-sm text-zinc-600 dark:text-zinc-400 font-medium">{item.date || "---"}</td>
+                  <td className="py-4 px-2 text-right">
+                    <div className="flex justify-end gap-1">
+                      <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-sky-500" onClick={() => handleEdit(item)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <span className="text-zinc-200 dark:text-zinc-800 py-1 px-1">|</span>
+                      <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-orange-500" onClick={() => handleDelete(item.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

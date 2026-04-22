@@ -13,10 +13,11 @@ const activitySchema = new Schema(
     imageUrl: { type: String, default: "", trim: true },
     category: {
       type: String,
-      enum: ["community", "workshop"],
+      enum: ["community", "workshop", "qualification"],
       required: true,
       default: "community",
     },
+    date: { type: String, default: "", trim: true },
     order: { type: Number, required: true, min: 1, default: 1 },
   },
   { timestamps: true },

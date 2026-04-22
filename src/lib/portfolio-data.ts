@@ -148,6 +148,7 @@ export function serializeActivity(doc: any): PortfolioActivity {
     description: ensureLocalized(doc.description),
     imageUrl: doc.imageUrl ?? "",
     category: doc.category,
+    date: doc.date ?? "",
     order: doc.order,
   };
 }
