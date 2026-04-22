@@ -66,10 +66,9 @@ export function ResearchSection({ research }: ResearchSectionProps) {
                   {item.documentUrl && (
                     <a
                       href={item.documentUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      download={`Research_Document_${item.id}.docx`}
                       className="p-3 rounded-xl bg-card border border-border/60 hover:bg-primary hover:text-white hover:border-primary transition-colors text-muted-foreground"
-                      title="View Document"
+                      title="Download Document"
                     >
                       <FileText className="w-5 h-5" />
                     </a>
