@@ -222,7 +222,7 @@ export const defaultActivitiesSeed: Array<Omit<PortfolioActivity, "id">> = [
   }
 ];
 
-export function buildLocalOtherExperience() {
+export function buildLocalOtherExperience(): PortfolioOtherExperience[] {
   return [];
 }
 
@@ -263,8 +263,8 @@ export const defaultResearchSeed: Array<Omit<PortfolioResearch, "id">> = [
   }
 ];
 
-export const buildLocalProfile = () => defaultProfileSeed;
-export const buildLocalProjects = () => defaultProjectsSeed;
-export const buildLocalExperience = () => defaultExperienceSeed;
-export const buildLocalActivities = () => defaultActivitiesSeed;
-export const buildLocalResearch = () => defaultResearchSeed;
+export const buildLocalProfile = (): PortfolioProfile => ({ id: "default", ...defaultProfileSeed });
+export const buildLocalProjects = (): PortfolioProject[] => defaultProjectsSeed.map((p, i) => ({ id: `p-${i}`, ...p }));
+export const buildLocalExperience = (): PortfolioExperience[] => defaultExperienceSeed.map((e, i) => ({ id: `e-${i}`, ...e }));
+export const buildLocalActivities = (): PortfolioActivity[] => defaultActivitiesSeed.map((a, i) => ({ id: `a-${i}`, ...a }));
+export const buildLocalResearch = (): PortfolioResearch[] => defaultResearchSeed.map((r, i) => ({ id: `r-${i}`, ...r }));
