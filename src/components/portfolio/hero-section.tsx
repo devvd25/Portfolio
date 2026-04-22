@@ -76,22 +76,7 @@ export function HeroSection({ profile }: HeroSectionProps) {
           ) : null}
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-3">
-          {[
-            t("portfolio.hero.card.productsShipped"),
-            t("portfolio.hero.card.yearsReact"),
-            t("portfolio.hero.card.openRemote"),
-          ].map((item) => (
-            <div
-              key={item}
-              className="rounded-3xl border border-white/80 bg-white/70 p-4 shadow-[0_14px_28px_-18px_rgba(126,74,30,0.35)] dark:border-zinc-700 dark:bg-zinc-900/70"
-            >
-              <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
-                {item}
-              </p>
-            </div>
-          ))}
-        </div>
+
       </motion.div>
 
       <motion.div

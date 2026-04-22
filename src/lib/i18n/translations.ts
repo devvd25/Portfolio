@@ -39,9 +39,7 @@ const vi: TranslationDictionary = {
   "portfolio.hero.downloadCv": "Tải CV",
   "portfolio.hero.adminDashboard": "Bảng điều khiển Admin",
   "portfolio.hero.availableForFreelance": "Sẵn sàng nhận freelance",
-  "portfolio.hero.card.productsShipped": "12+ sản phẩm đã ra mắt",
-  "portfolio.hero.card.yearsReact": "5+ năm làm việc với React",
-  "portfolio.hero.card.openRemote": "Sẵn sàng hợp tác từ xa toàn cầu",
+
   "portfolio.about.badge": "Giới thiệu",
   "portfolio.about.heading":
     "Xây dựng sản phẩm hướng người dùng với kiến trúc sạch và giao diện có chiều sâu.",
@@ -236,9 +234,7 @@ const en: TranslationDictionary = {
   "portfolio.hero.downloadCv": "Download CV",
   "portfolio.hero.adminDashboard": "Admin Dashboard",
   "portfolio.hero.availableForFreelance": "Available for freelance",
-  "portfolio.hero.card.productsShipped": "12+ Products shipped",
-  "portfolio.hero.card.yearsReact": "5+ Years building with React",
-  "portfolio.hero.card.openRemote": "Open for global remote",
+
   "portfolio.about.badge": "About",
   "portfolio.about.heading":
     "Building user-focused products with clean architecture and expressive UI.",
