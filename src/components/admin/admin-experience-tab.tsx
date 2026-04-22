@@ -255,30 +255,71 @@ export function AdminExperienceTab({ isAutoSaveEnabled = false }: { isAutoSaveEn
         </Button>
       </form>
 
-      <div className="space-y-4 rounded-3xl border border-white/80 bg-gradient-to-br from-white to-[#f7ecdf] p-6 shadow-md dark:border-zinc-700 dark:from-zinc-900 dark:to-zinc-800">
+      <div className="space-y-6 rounded-3xl border border-white/80 bg-gradient-to-br from-white to-[#f7ecdf] p-6 shadow-md dark:border-zinc-700 dark:from-zinc-900 dark:to-zinc-800">
         <h2 className="font-display text-2xl font-black text-zinc-900 dark:text-zinc-50">{t("admin.experience.list")}</h2>
-        <div className="space-y-3">
-          {sortedData.map(item => (
-            <article 
-              key={item.id} 
-              className={`rounded-2xl border border-zinc-200 bg-white/80 p-4 dark:border-zinc-700 dark:bg-zinc-900/70 flex justify-between items-center ${item.isHidden ? "opacity-50" : ""}`}
-            >
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${item.type === "other" ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300" : "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300"}`}>
-                    {item.type === "other" ? t("admin.experience.type.other") : t("admin.experience.type.work")}
-                  </span>
-                  {item.isHidden && <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">HIDDEN</span>}
-                </div>
-                <h3 className="font-semibold">{item.role[language]} @ {item.company}</h3>
-                <p className="text-xs text-muted-foreground">{item.period[language]}</p>
-              </div>
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => handleEdit(item)}>{t("admin.common.edit")}</Button>
-                <Button size="sm" variant="outline" onClick={() => handleDelete(item.id)}><Trash2 className="h-4 w-4 text-red-500" /></Button>
-              </div>
-            </article>
-          ))}
+        
+        <div className="space-y-6">
+          {/* Work Experience Section */}
+          <div className="space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-500 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-sky-500"></span>
+              {t("admin.experience.type.work")}
+            </h3>
+            <div className="space-y-2">
+              {sortedData.filter(item => (item.type || "work") === "work").length === 0 && (
+                <p className="text-xs text-zinc-400 italic py-2 px-4 border border-dashed border-zinc-200 rounded-xl">Chưa có kinh nghiệm làm việc.</p>
+              )}
+              {sortedData.filter(item => (item.type || "work") === "work").map(item => (
+                <article 
+                  key={item.id} 
+                  className={`rounded-2xl border border-zinc-200 bg-white/80 p-4 dark:border-zinc-700 dark:bg-zinc-900/70 flex justify-between items-center ${item.isHidden ? "opacity-50" : ""}`}
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      {item.isHidden && <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">HIDDEN</span>}
+                    </div>
+                    <h4 className="font-semibold truncate text-sm">{item.role[language]} @ {item.company}</h4>
+                    <p className="text-[10px] text-muted-foreground">{item.period[language]}</p>
+                  </div>
+                  <div className="flex gap-1 ml-4 shrink-0">
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => handleEdit(item)}><Plus className="h-4 w-4 rotate-45" /></Button>
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-red-500" onClick={() => handleDelete(item.id)}><Trash2 className="h-4 w-4" /></Button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+
+          {/* Other Experience Section */}
+          <div className="space-y-3 pt-4 border-t border-zinc-200/50">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-500 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+              {t("admin.experience.type.other")}
+            </h3>
+            <div className="space-y-2">
+              {sortedData.filter(item => item.type === "other").length === 0 && (
+                <p className="text-xs text-zinc-400 italic py-2 px-4 border border-dashed border-zinc-200 rounded-xl">Chưa có kinh nghiệm khác.</p>
+              )}
+              {sortedData.filter(item => item.type === "other").map(item => (
+                <article 
+                  key={item.id} 
+                  className={`rounded-2xl border border-zinc-200 bg-white/80 p-4 dark:border-zinc-700 dark:bg-zinc-900/70 flex justify-between items-center ${item.isHidden ? "opacity-50" : ""}`}
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      {item.isHidden && <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">HIDDEN</span>}
+                    </div>
+                    <h4 className="font-semibold truncate text-sm">{item.role[language]} @ {item.company}</h4>
+                    <p className="text-[10px] text-muted-foreground">{item.period[language]}</p>
+                  </div>
+                  <div className="flex gap-1 ml-4 shrink-0">
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => handleEdit(item)}><Plus className="h-4 w-4 rotate-45" /></Button>
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-red-500" onClick={() => handleDelete(item.id)}><Trash2 className="h-4 w-4" /></Button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
