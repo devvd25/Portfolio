@@ -78,7 +78,7 @@ function buildLocalResearch(): PortfolioResearch[] {
   }));
 }
 
-function serializeProfile(profile: any): PortfolioProfile {
+export function serializeProfile(profile: any): PortfolioProfile {
   return {
     id: String(profile._id),
     fullName: profile.fullName,
@@ -100,7 +100,7 @@ function serializeProfile(profile: any): PortfolioProfile {
   };
 }
 
-function serializeProject(project: any): PortfolioProject {
+export function serializeProject(project: any): PortfolioProject {
   return {
     id: String(project._id),
     title: ensureLocalized(project.title),
@@ -114,7 +114,7 @@ function serializeProject(project: any): PortfolioProject {
   };
 }
 
-function serializeExperience(doc: any): PortfolioExperience {
+export function serializeExperience(doc: any): PortfolioExperience {
   return {
     id: String(doc._id),
     company: doc.company,
@@ -129,7 +129,7 @@ function serializeExperience(doc: any): PortfolioExperience {
   };
 }
 
-function serializeOtherExperience(doc: any): PortfolioOtherExperience {
+export function serializeOtherExperience(doc: any): PortfolioOtherExperience {
   return {
     id: String(doc._id),
     title: ensureLocalized(doc.title),
@@ -141,7 +141,7 @@ function serializeOtherExperience(doc: any): PortfolioOtherExperience {
   };
 }
 
-function serializeActivity(doc: any): PortfolioActivity {
+export function serializeActivity(doc: any): PortfolioActivity {
   return {
     id: String(doc._id),
     title: ensureLocalized(doc.title),
@@ -152,7 +152,7 @@ function serializeActivity(doc: any): PortfolioActivity {
   };
 }
 
-function serializeResearch(doc: any): PortfolioResearch {
+export function serializeResearch(doc: any): PortfolioResearch {
   return {
     id: String(doc._id),
     title: ensureLocalized(doc.title),
