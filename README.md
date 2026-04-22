@@ -1,4 +1,4 @@
-# DevClay Portfolio
+# CV.DEV Portfolio
 
 Modern developer portfolio with claymorphism-inspired UI, secure admin dashboard, MongoDB CRUD APIs, and Vercel-ready deployment.
 

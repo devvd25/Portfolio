@@ -18,7 +18,7 @@ const displayFont = Sora({
 });
 
 export const metadata: Metadata = {
-  title: "DevClay Portfolio",
+  title: "CV.DEV Portfolio",
   description:
     "Modern claymorphism portfolio with Next.js, MongoDB, secure admin dashboard, and deploy-ready APIs.",
   metadataBase: new URL(

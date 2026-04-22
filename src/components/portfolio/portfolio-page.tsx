@@ -56,7 +56,7 @@ export function PortfolioPage({ profile, projects, skills, experience, otherExpe
       <header className="sticky top-0 z-30 border-b border-orange-100/60 bg-background/85 backdrop-blur-md dark:border-zinc-800">
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
           <a href="#home" className="font-display text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-50">
-            DevClay
+            CV.DEV
           </a>
 
           <div className="hidden items-center gap-6 text-sm font-semibold text-zinc-700 md:flex dark:text-zinc-200">
