@@ -245,6 +245,7 @@ export async function getPortfolioSnapshot() {
       profile: buildLocalProfile(),
       projects: buildLocalProjects(),
       experience: buildLocalExperience(),
+      otherExperience: buildLocalOtherExperience(),
       activities: buildLocalActivities(),
       research: buildLocalResearch(),
       source: "fallback" as const,
