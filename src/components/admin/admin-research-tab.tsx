@@ -7,23 +7,25 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import type { PortfolioResearch } from "@/types/portfolio";
+import type { PortfolioResearch, LocalizedString } from "@/types/portfolio";
 
 export function AdminResearchTab() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [data, setData] = useState<PortfolioResearch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
+  const emptyLocalizedString: LocalizedString = { vi: "", en: "" };
   const emptyForm = {
-    title: "",
-    period: "",
+    title: { ...emptyLocalizedString },
+    period: { ...emptyLocalizedString },
     authorsText: "",
-    abstract: "",
+    abstract: { ...emptyLocalizedString },
     technologiesText: "",
-    achievementsText: "",
+    achievementsTextVI: "",
+    achievementsTextEN: "",
     demoUrl: "",
     documentUrl: "",
     order: 1,
@@ -56,13 +58,25 @@ export function AdminResearchTab() {
     setIsSaving(true);
     setNotice(null);
 
+    const viAch = form.achievementsTextVI.split("\n").map(t => t.trim()).filter(Boolean);
+    const enAch = form.achievementsTextEN.split("\n").map(t => t.trim()).filter(Boolean);
+    const maxAch = Math.max(viAch.length, enAch.length);
+    
+    const achievements: LocalizedString[] = [];
+    for (let i = 0; i < maxAch; i++) {
+      achievements.push({
+        vi: viAch[i] || "",
+        en: enAch[i] || ""
+      });
+    }
+
     const payload = {
       title: form.title,
       period: form.period,
       abstract: form.abstract,
       authors: form.authorsText.split(",").map(t => t.trim()).filter(Boolean),
       technologies: form.technologiesText.split(",").map(t => t.trim()).filter(Boolean),
-      achievements: form.achievementsText.split("\n").map(t => t.trim()).filter(Boolean),
+      achievements,
       demoUrl: form.demoUrl,
       documentUrl: form.documentUrl,
       order: Number(form.order),
@@ -81,7 +95,7 @@ export function AdminResearchTab() {
 
       setNotice({ type: "success", message: t("admin.common.saveSuccess") });
       setEditingId(null);
-      setForm(emptyForm);
+      setForm({ ...emptyForm, order: data.length + 1 });
       await loadData();
     } catch {
       setNotice({ type: "error", message: t("admin.common.saveFailed") });
@@ -113,7 +127,8 @@ export function AdminResearchTab() {
       abstract: item.abstract,
       authorsText: item.authors.join(", "),
       technologiesText: item.technologies.join(", "),
-      achievementsText: item.achievements.join("\n"),
+      achievementsTextVI: item.achievements.map(a => a.vi).join("\n"),
+      achievementsTextEN: item.achievements.map(a => a.en).join("\n"),
       demoUrl: item.demoUrl,
       documentUrl: item.documentUrl,
       order: item.order,
@@ -134,20 +149,56 @@ export function AdminResearchTab() {
           )}
         </div>
 
-        {notice && <div className="p-3 text-sm rounded bg-amber-100 text-amber-800">{notice.message}</div>}
+        {notice && <div className={`p-3 text-sm rounded ${notice.type === "success" ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}>{notice.message}</div>}
 
-        <label className="text-sm font-semibold block">{t("admin.activities.title")} <Input required value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} /></label>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="text-sm font-semibold block">{t("admin.activities.title")} (VI)
+            <Input required value={form.title.vi} onChange={e => setForm({ ...form, title: { ...form.title, vi: e.target.value } })} />
+          </label>
+          <label className="text-sm font-semibold block">{t("admin.activities.title")} (EN)
+            <Input required value={form.title.en} onChange={e => setForm({ ...form, title: { ...form.title, en: e.target.value } })} />
+          </label>
+        </div>
         
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="text-sm font-semibold">{t("admin.experience.period")} <Input required value={form.period} onChange={e => setForm({ ...form, period: e.target.value })} /></label>
-          <label className="text-sm font-semibold">{t("admin.experience.order")} <Input type="number" required value={form.order} onChange={e => setForm({ ...form, order: Number(e.target.value) })} /></label>
+          <label className="text-sm font-semibold block">{t("admin.experience.period")} (VI)
+            <Input required value={form.period.vi} onChange={e => setForm({ ...form, period: { ...form.period, vi: e.target.value } })} />
+          </label>
+          <label className="text-sm font-semibold block">{t("admin.experience.period")} (EN)
+            <Input required value={form.period.en} onChange={e => setForm({ ...form, period: { ...form.period, en: e.target.value } })} />
+          </label>
         </div>
 
-        <label className="text-sm font-semibold block">{t("admin.research.authors")} <Input required value={form.authorsText} onChange={e => setForm({ ...form, authorsText: e.target.value })} /></label>
-        <label className="text-sm font-semibold block">{t("admin.research.technologies")} <Input required value={form.technologiesText} onChange={e => setForm({ ...form, technologiesText: e.target.value })} /></label>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="text-sm font-semibold block">{t("admin.research.authors")} 
+            <Input required value={form.authorsText} onChange={e => setForm({ ...form, authorsText: e.target.value })} />
+          </label>
+          <label className="text-sm font-semibold block">{t("admin.experience.order")} 
+            <Input type="number" required value={form.order} onChange={e => setForm({ ...form, order: Number(e.target.value) })} />
+          </label>
+        </div>
 
-        <label className="text-sm font-semibold block">{t("admin.research.abstract")} <Textarea required rows={3} value={form.abstract} onChange={e => setForm({ ...form, abstract: e.target.value })} /></label>
-        <label className="text-sm font-semibold block">{t("admin.research.achievements")} <Textarea required rows={3} value={form.achievementsText} onChange={e => setForm({ ...form, achievementsText: e.target.value })} /></label>
+        <label className="text-sm font-semibold block">{t("admin.research.technologies")} 
+          <Input required value={form.technologiesText} onChange={e => setForm({ ...form, technologiesText: e.target.value })} />
+        </label>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="text-sm font-semibold block">{t("admin.research.abstract")} (VI)
+            <Textarea required rows={3} value={form.abstract.vi} onChange={e => setForm({ ...form, abstract: { ...form.abstract, vi: e.target.value } })} />
+          </label>
+          <label className="text-sm font-semibold block">{t("admin.research.abstract")} (EN)
+            <Textarea required rows={3} value={form.abstract.en} onChange={e => setForm({ ...form, abstract: { ...form.abstract, en: e.target.value } })} />
+          </label>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="text-sm font-semibold block">{t("admin.research.achievements")} (VI)
+            <Textarea required rows={3} value={form.achievementsTextVI} onChange={e => setForm({ ...form, achievementsTextVI: e.target.value })} placeholder="Mỗi dòng một thành tựu" />
+          </label>
+          <label className="text-sm font-semibold block">{t("admin.research.achievements")} (EN)
+            <Textarea required rows={3} value={form.achievementsTextEN} onChange={e => setForm({ ...form, achievementsTextEN: e.target.value })} placeholder="One achievement per line" />
+          </label>
+        </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="text-sm font-semibold block">{t("admin.research.demoUrl")} <Input value={form.demoUrl} onChange={e => setForm({ ...form, demoUrl: e.target.value })} /></label>
@@ -166,8 +217,8 @@ export function AdminResearchTab() {
           {sortedData.map(item => (
             <article key={item.id} className="rounded-2xl border border-zinc-200 bg-white/80 p-4 dark:border-zinc-700 dark:bg-zinc-900/70 flex justify-between">
               <div>
-                <h3 className="font-semibold text-sm line-clamp-1">{item.title}</h3>
-                <p className="text-xs text-muted-foreground">{item.period}</p>
+                <h3 className="font-semibold text-sm line-clamp-1">{item.title[language]}</h3>
+                <p className="text-xs text-muted-foreground">{item.period[language]}</p>
               </div>
               <div className="flex gap-2">
                 <Button size="sm" variant="outline" onClick={() => handleEdit(item)}>{t("admin.common.edit")}</Button>

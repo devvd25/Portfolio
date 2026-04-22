@@ -17,9 +17,25 @@ import type {
   PortfolioExperience,
   PortfolioActivity,
   PortfolioResearch,
+  LocalizedString,
 } from "@/types/portfolio";
 
 import { connectToDatabase, isMongoConfigured } from "./db";
+
+function ensureLocalized(value: any, fallback: string = ""): LocalizedString {
+  if (value && typeof value === "object" && "vi" in value && "en" in value) {
+    return value as LocalizedString;
+  }
+  const str = typeof value === "string" ? value : fallback;
+  return { vi: str, en: str };
+}
+
+function ensureLocalizedArray(value: any): LocalizedString[] {
+  if (Array.isArray(value)) {
+    return value.map(item => ensureLocalized(item));
+  }
+  return [];
+}
 
 function buildLocalProfile(): PortfolioProfile {
   return {
@@ -56,24 +72,13 @@ function buildLocalResearch(): PortfolioResearch[] {
   }));
 }
 
-function serializeProfile(profile: {
-  _id: unknown;
-  fullName: string;
-  headline: string;
-  location: string;
-  bio: string;
-  email: string;
-  githubUrl?: string;
-  linkedinUrl?: string;
-  avatarUrl?: string;
-  cvUrl?: string;
-}): PortfolioProfile {
+function serializeProfile(profile: any): PortfolioProfile {
   return {
     id: String(profile._id),
     fullName: profile.fullName,
-    headline: profile.headline,
-    location: profile.location,
-    bio: profile.bio,
+    headline: ensureLocalized(profile.headline),
+    location: ensureLocalized(profile.location),
+    bio: ensureLocalized(profile.bio),
     email: profile.email,
     githubUrl: profile.githubUrl ?? "",
     linkedinUrl: profile.linkedinUrl ?? "",
@@ -82,21 +87,11 @@ function serializeProfile(profile: {
   };
 }
 
-function serializeProject(project: {
-  _id: unknown;
-  title: string;
-  summary: string;
-  stack: string[];
-  imageUrl?: string;
-  demoUrl?: string;
-  repoUrl?: string;
-  featured?: boolean;
-  order: number;
-}): PortfolioProject {
+function serializeProject(project: any): PortfolioProject {
   return {
     id: String(project._id),
-    title: project.title,
-    summary: project.summary,
+    title: ensureLocalized(project.title),
+    summary: ensureLocalized(project.summary),
     stack: project.stack,
     imageUrl: project.imageUrl ?? "",
     demoUrl: project.demoUrl ?? "",
@@ -110,9 +105,9 @@ function serializeExperience(doc: any): PortfolioExperience {
   return {
     id: String(doc._id),
     company: doc.company,
-    role: doc.role,
-    period: doc.period,
-    tasks: doc.tasks,
+    role: ensureLocalized(doc.role),
+    period: ensureLocalized(doc.period),
+    tasks: ensureLocalizedArray(doc.tasks),
     techStack: doc.techStack,
     companyImageUrl: doc.companyImageUrl ?? "",
     environmentImageUrl: doc.environmentImageUrl ?? "",
@@ -123,8 +118,8 @@ function serializeExperience(doc: any): PortfolioExperience {
 function serializeActivity(doc: any): PortfolioActivity {
   return {
     id: String(doc._id),
-    title: doc.title,
-    description: doc.description,
+    title: ensureLocalized(doc.title),
+    description: ensureLocalized(doc.description),
     imageUrl: doc.imageUrl ?? "",
     category: doc.category,
     order: doc.order,
@@ -134,12 +129,12 @@ function serializeActivity(doc: any): PortfolioActivity {
 function serializeResearch(doc: any): PortfolioResearch {
   return {
     id: String(doc._id),
-    title: doc.title,
-    period: doc.period,
+    title: ensureLocalized(doc.title),
+    period: ensureLocalized(doc.period),
     authors: doc.authors,
-    abstract: doc.abstract,
+    abstract: ensureLocalized(doc.abstract),
     technologies: doc.technologies,
-    achievements: doc.achievements,
+    achievements: ensureLocalizedArray(doc.achievements),
     demoUrl: doc.demoUrl ?? "",
     documentUrl: doc.documentUrl ?? "",
     order: doc.order,
@@ -227,7 +222,8 @@ export async function getPortfolioSnapshot() {
       research: resDocs.map(serializeResearch),
       source: "database" as const,
     };
-  } catch {
+  } catch (error) {
+    console.error("Snapshot fetch error:", error);
     return {
       profile: buildLocalProfile(),
       projects: buildLocalProjects(),

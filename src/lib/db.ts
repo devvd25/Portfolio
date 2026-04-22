@@ -49,10 +49,19 @@ export async function connectToDatabase() {
 
   if (!globalCache.promise) {
     globalCache.promise = mongoose.connect(mongodbUri, {
-      dbName: process.env.MONGODB_DB ?? "portfolio_app",
+      dbName: process.env.MONGODB_DB ?? "PORTFOLIO",
+      bufferCommands: false,
+    }).catch(err => {
+      globalCache.promise = null; // Clear promise on error to allow retry
+      throw err;
     });
   }
 
-  globalCache.conn = await globalCache.promise;
+  try {
+    globalCache.conn = await globalCache.promise;
+  } catch (err) {
+    globalCache.promise = null; // Clear promise if await fails
+    throw err;
+  }
   return globalCache.conn;
 }

@@ -10,7 +10,7 @@ interface ExperienceSectionProps {
 }
 
 export function ExperienceSection({ experience }: ExperienceSectionProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   if (!experience || experience.length === 0) return null;
 
@@ -58,7 +58,7 @@ export function ExperienceSection({ experience }: ExperienceSectionProps) {
                 <div className="flex justify-between items-start mb-6 gap-4">
                   <div>
                     <h3 className="text-2xl font-bold font-display text-foreground mb-2">
-                      {exp.role}
+                      {exp.role[language]}
                     </h3>
                     <div className="flex items-center gap-2 text-primary font-medium">
                       <span className="flex items-center gap-1">
@@ -68,7 +68,7 @@ export function ExperienceSection({ experience }: ExperienceSectionProps) {
                     </div>
                   </div>
                   <span className="px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium border border-primary/20 whitespace-nowrap">
-                    {exp.period}
+                    {exp.period[language]}
                   </span>
                 </div>
 
@@ -76,7 +76,7 @@ export function ExperienceSection({ experience }: ExperienceSectionProps) {
                   {exp.tasks.map((task, i) => (
                     <div key={i} className="flex items-start gap-3 text-muted-foreground">
                       <CheckCircle2 className="w-5 h-5 text-primary/70 shrink-0 mt-0.5" />
-                      <p className="leading-relaxed">{task}</p>
+                      <p className="leading-relaxed">{task[language]}</p>
                     </div>
                   ))}
                 </div>

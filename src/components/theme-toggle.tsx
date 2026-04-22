@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 
@@ -7,11 +8,20 @@ import { useLanguage } from "@/components/language-provider";
 import { Button } from "@/components/ui/button";
 
 export function ThemeToggle() {
+  const [mounted, setMounted] = useState(false);
   const { resolvedTheme, setTheme } = useTheme();
   const { t } = useLanguage();
 
-  if (!resolvedTheme) {
-    return <div className="h-11 w-11 rounded-2xl bg-zinc-100/70 dark:bg-zinc-800/70" />;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <Button variant="outline" size="icon" className="rounded-2xl opacity-50" aria-hidden="true">
+        <span className="h-4 w-4" />
+      </Button>
+    );
   }
 
   const isDark = resolvedTheme === "dark";

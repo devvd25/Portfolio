@@ -15,7 +15,7 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ profile }: HeroSectionProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   return (
     <section id="home" className="grid gap-12 py-20 lg:grid-cols-[1.1fr_0.9fr] lg:py-28">
@@ -33,10 +33,10 @@ export function HeroSection({ profile }: HeroSectionProps) {
             <span className="text-gradient">{profile.fullName}</span>
           </h1>
           <p className="max-w-2xl text-lg leading-relaxed text-zinc-700 dark:text-zinc-200">
-            {profile.headline}
+            {profile.headline[language]}
           </p>
           <p className="max-w-2xl text-base leading-relaxed text-zinc-600 dark:text-zinc-300">
-            {profile.bio}
+            {profile.bio[language]}
           </p>
         </div>
 

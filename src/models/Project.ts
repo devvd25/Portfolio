@@ -3,14 +3,12 @@ import { type InferSchemaType, Schema, model, models } from "mongoose";
 const projectSchema = new Schema(
   {
     title: {
-      type: String,
-      required: true,
-      trim: true,
+      vi: { type: String, required: true, trim: true },
+      en: { type: String, required: true, trim: true },
     },
     summary: {
-      type: String,
-      required: true,
-      trim: true,
+      vi: { type: String, required: true, trim: true },
+      en: { type: String, required: true, trim: true },
     },
     stack: {
       type: [String],

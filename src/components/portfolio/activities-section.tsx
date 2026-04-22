@@ -11,7 +11,7 @@ interface ActivitiesSectionProps {
 }
 
 export function ActivitiesSection({ activities }: ActivitiesSectionProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   if (!activities || activities.length === 0) return null;
 
@@ -53,7 +53,7 @@ export function ActivitiesSection({ activities }: ActivitiesSectionProps) {
                 {activity.imageUrl ? (
                   <Image
                     src={activity.imageUrl}
-                    alt={activity.title}
+                    alt={activity.title[language]}
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                   />
@@ -82,10 +82,10 @@ export function ActivitiesSection({ activities }: ActivitiesSectionProps) {
 
               <div className="p-6 flex-grow flex flex-col">
                 <h3 className="text-xl font-bold font-display mb-3 group-hover:text-primary transition-colors">
-                  {activity.title}
+                  {activity.title[language]}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed flex-grow">
-                  {activity.description}
+                  {activity.description[language]}
                 </p>
               </div>
             </motion.div>

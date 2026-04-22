@@ -1,11 +1,16 @@
 import type { JWTPayload } from "jose";
 
+export type LocalizedString = {
+  vi: string;
+  en: string;
+};
+
 export interface PortfolioProfile {
   id: string;
   fullName: string;
-  headline: string;
-  location: string;
-  bio: string;
+  headline: LocalizedString;
+  location: LocalizedString;
+  bio: LocalizedString;
   email: string;
   githubUrl: string;
   linkedinUrl: string;
@@ -15,8 +20,8 @@ export interface PortfolioProfile {
 
 export interface PortfolioProject {
   id: string;
-  title: string;
-  summary: string;
+  title: LocalizedString;
+  summary: LocalizedString;
   stack: string[];
   imageUrl: string;
   demoUrl: string;
@@ -26,17 +31,17 @@ export interface PortfolioProject {
 }
 
 export interface SkillCategory {
-  title: string;
-  description: string;
+  title: LocalizedString;
+  description: LocalizedString;
   items: string[];
 }
 
 export interface PortfolioExperience {
   id: string;
   company: string;
-  role: string;
-  period: string;
-  tasks: string[];
+  role: LocalizedString;
+  period: LocalizedString;
+  tasks: LocalizedString[];
   techStack: string[];
   companyImageUrl: string;
   environmentImageUrl: string;
@@ -45,8 +50,8 @@ export interface PortfolioExperience {
 
 export interface PortfolioActivity {
   id: string;
-  title: string;
-  description: string;
+  title: LocalizedString;
+  description: LocalizedString;
   imageUrl: string;
   category: "community" | "workshop";
   order: number;
@@ -54,12 +59,12 @@ export interface PortfolioActivity {
 
 export interface PortfolioResearch {
   id: string;
-  title: string;
-  period: string;
+  title: LocalizedString;
+  period: LocalizedString;
   authors: string[];
-  abstract: string;
+  abstract: LocalizedString;
   technologies: string[];
-  achievements: string[];
+  achievements: LocalizedString[];
   demoUrl: string;
   documentUrl: string;
   order: number;

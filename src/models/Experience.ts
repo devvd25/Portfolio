@@ -3,9 +3,21 @@ import { type InferSchemaType, Schema, model, models } from "mongoose";
 const experienceSchema = new Schema(
   {
     company: { type: String, required: true, trim: true },
-    role: { type: String, required: true, trim: true },
-    period: { type: String, required: true, trim: true },
-    tasks: { type: [String], default: [] },
+    role: {
+      vi: { type: String, required: true, trim: true },
+      en: { type: String, required: true, trim: true },
+    },
+    period: {
+      vi: { type: String, required: true, trim: true },
+      en: { type: String, required: true, trim: true },
+    },
+    tasks: {
+      type: [{
+        vi: { type: String, required: true, trim: true },
+        en: { type: String, required: true, trim: true },
+      }],
+      default: [],
+    },
     techStack: { type: [String], default: [] },
     companyImageUrl: { type: String, default: "", trim: true },
     environmentImageUrl: { type: String, default: "", trim: true },

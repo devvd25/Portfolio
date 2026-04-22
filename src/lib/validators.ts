@@ -9,6 +9,11 @@ const optionalHttpUrl = z
   })
   .default("");
 
+const localizedStringSchema = (min: number, label: string) => z.object({
+  vi: z.string().trim().min(min, `${label} (tiếng Việt) quá ngắn.`),
+  en: z.string().trim().min(min, `${label} (English) is too short.`),
+});
+
 export const loginSchema = z.object({
   email: z.email("Email khong hop le.").trim(),
   password: z.string().trim().min(1, "Mat khau khong duoc de trong."),
@@ -16,9 +21,9 @@ export const loginSchema = z.object({
 
 export const profileSchema = z.object({
   fullName: z.string().trim().min(2, "Ten qua ngan."),
-  headline: z.string().trim().min(5, "Headline qua ngan."),
-  location: z.string().trim().min(2, "Vui long nhap dia diem."),
-  bio: z.string().trim().min(20, "Bio toi thieu 20 ky tu."),
+  headline: localizedStringSchema(5, "Headline"),
+  location: localizedStringSchema(2, "Dia diem"),
+  bio: localizedStringSchema(20, "Bio"),
   email: z.email("Email khong hop le.").trim(),
   githubUrl: optionalHttpUrl,
   linkedinUrl: optionalHttpUrl,
@@ -27,13 +32,44 @@ export const profileSchema = z.object({
 });
 
 export const projectSchema = z.object({
-  title: z.string().trim().min(2, "Ten du an qua ngan."),
-  summary: z.string().trim().min(20, "Mo ta toi thieu 20 ky tu."),
+  title: localizedStringSchema(2, "Ten du an"),
+  summary: localizedStringSchema(20, "Mo ta du an"),
   stack: z.array(z.string().trim().min(1)).min(1, "Can it nhat 1 cong nghe."),
   imageUrl: optionalHttpUrl,
   demoUrl: optionalHttpUrl,
   repoUrl: optionalHttpUrl,
   featured: z.boolean().default(false),
+  order: z.number().int().min(1).optional(),
+});
+
+export const experienceSchema = z.object({
+  company: z.string().trim().min(2, "Ten cong ty qua ngan."),
+  role: localizedStringSchema(2, "Chuc vu"),
+  period: localizedStringSchema(2, "Thoi gian"),
+  tasks: z.array(localizedStringSchema(5, "Nhiem vu")),
+  techStack: z.array(z.string().trim().min(1)),
+  companyImageUrl: optionalHttpUrl,
+  environmentImageUrl: optionalHttpUrl,
+  order: z.number().int().min(1).optional(),
+});
+
+export const activitySchema = z.object({
+  title: localizedStringSchema(2, "Tieu de hoat dong"),
+  description: localizedStringSchema(10, "Mo ta hoat dong"),
+  imageUrl: optionalHttpUrl,
+  category: z.enum(["community", "workshop"]),
+  order: z.number().int().min(1).optional(),
+});
+
+export const researchSchema = z.object({
+  title: localizedStringSchema(5, "Tieu de nghien cuu"),
+  period: localizedStringSchema(2, "Thoi gian"),
+  authors: z.array(z.string().trim().min(2)),
+  abstract: localizedStringSchema(50, "Abstract"),
+  technologies: z.array(z.string().trim().min(1)),
+  achievements: z.array(localizedStringSchema(5, "Thanh tuu")),
+  demoUrl: optionalHttpUrl,
+  documentUrl: optionalHttpUrl,
   order: z.number().int().min(1).optional(),
 });
 

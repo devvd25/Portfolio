@@ -7,19 +7,20 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import type { PortfolioActivity } from "@/types/portfolio";
+import type { PortfolioActivity, LocalizedString } from "@/types/portfolio";
 
 export function AdminActivitiesTab() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [data, setData] = useState<PortfolioActivity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
+  const emptyLocalizedString: LocalizedString = { vi: "", en: "" };
   const emptyForm = {
-    title: "",
-    description: "",
+    title: { ...emptyLocalizedString },
+    description: { ...emptyLocalizedString },
     imageUrl: "",
     category: "community" as "community" | "workshop",
     order: 1,
@@ -67,7 +68,7 @@ export function AdminActivitiesTab() {
 
       setNotice({ type: "success", message: t("admin.common.saveSuccess") });
       setEditingId(null);
-      setForm(emptyForm);
+      setForm({ ...emptyForm, order: data.length + 1 });
       await loadData();
     } catch {
       setNotice({ type: "error", message: t("admin.common.saveFailed") });
@@ -116,11 +117,25 @@ export function AdminActivitiesTab() {
           )}
         </div>
 
-        {notice && <div className="p-3 text-sm rounded bg-amber-100 text-amber-800">{notice.message}</div>}
+        {notice && <div className={`p-3 text-sm rounded ${notice.type === "success" ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}>{notice.message}</div>}
 
-        <label className="text-sm font-semibold block">{t("admin.activities.title")} <Input required value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} /></label>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="text-sm font-semibold block">{t("admin.activities.title")} (VI)
+            <Input required value={form.title.vi} onChange={e => setForm({ ...form, title: { ...form.title, vi: e.target.value } })} />
+          </label>
+          <label className="text-sm font-semibold block">{t("admin.activities.title")} (EN)
+            <Input required value={form.title.en} onChange={e => setForm({ ...form, title: { ...form.title, en: e.target.value } })} />
+          </label>
+        </div>
         
-        <label className="text-sm font-semibold block">{t("admin.activities.description")} <Textarea required rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} /></label>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="text-sm font-semibold block">{t("admin.activities.description")} (VI)
+            <Textarea required rows={3} value={form.description.vi} onChange={e => setForm({ ...form, description: { ...form.description, vi: e.target.value } })} />
+          </label>
+          <label className="text-sm font-semibold block">{t("admin.activities.description")} (EN)
+            <Textarea required rows={3} value={form.description.en} onChange={e => setForm({ ...form, description: { ...form.description, en: e.target.value } })} />
+          </label>
+        </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="text-sm font-semibold">{t("admin.activities.category")} 
@@ -150,7 +165,7 @@ export function AdminActivitiesTab() {
           {sortedData.map(item => (
             <article key={item.id} className="rounded-2xl border border-zinc-200 bg-white/80 p-4 dark:border-zinc-700 dark:bg-zinc-900/70 flex justify-between">
               <div>
-                <h3 className="font-semibold">{item.title}</h3>
+                <h3 className="font-semibold">{item.title[language]}</h3>
                 <p className="text-xs text-muted-foreground uppercase">{item.category}</p>
               </div>
               <div className="flex gap-2">

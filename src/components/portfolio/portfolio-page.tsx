@@ -45,7 +45,7 @@ const sectionMotion = {
 } as const;
 
 export function PortfolioPage({ profile, projects, skills, experience, activities, research }: PortfolioPageProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   return (
     <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
@@ -107,7 +107,7 @@ export function PortfolioPage({ profile, projects, skills, experience, activitie
             <div className="flex flex-wrap gap-4 text-sm text-zinc-700 dark:text-zinc-200">
               <span className="inline-flex items-center gap-2 rounded-2xl border border-orange-200 bg-white/70 px-4 py-2 shadow-[0_10px_20px_rgba(249,115,22,0.14)] dark:border-zinc-700 dark:bg-zinc-900/70">
                 <MapPin className="h-4 w-4 text-orange-500" />
-                {profile.location}
+                {profile.location[language]}
               </span>
               <span className="inline-flex items-center gap-2 rounded-2xl border border-sky-200 bg-white/70 px-4 py-2 shadow-[0_10px_20px_rgba(56,189,248,0.14)] dark:border-zinc-700 dark:bg-zinc-900/70">
                 <Sparkles className="h-4 w-4 text-sky-500" />
@@ -151,7 +151,7 @@ export function PortfolioPage({ profile, projects, skills, experience, activitie
           <div className="grid gap-6 md:grid-cols-3">
             {skills.map((skillCategory, index) => (
               <motion.article
-                key={skillCategory.title}
+                key={skillCategory.title[language]}
                 initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.4 }}
@@ -159,10 +159,10 @@ export function PortfolioPage({ profile, projects, skills, experience, activitie
                 className="glass-card-hover rounded-3xl p-6"
               >
                 <h3 className="font-display text-2xl font-black text-zinc-900 dark:text-zinc-50">
-                  {skillCategory.title}
+                  {skillCategory.title[language]}
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
-                  {skillCategory.description}
+                  {skillCategory.description[language]}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {skillCategory.items.map((item) => (
@@ -200,7 +200,7 @@ export function PortfolioPage({ profile, projects, skills, experience, activitie
                 <div className="relative overflow-hidden">
                   <Image
                     src={project.imageUrl || profile.avatarUrl}
-                    alt={project.title}
+                    alt={project.title[language]}
                     width={1200}
                     height={800}
                     className="h-48 w-full object-cover transition duration-500 group-hover:scale-105"
@@ -215,10 +215,10 @@ export function PortfolioPage({ profile, projects, skills, experience, activitie
 
                 <div className="space-y-4 p-5">
                   <h3 className="font-display text-2xl font-black text-zinc-900 dark:text-zinc-50">
-                    {project.title}
+                    {project.title[language]}
                   </h3>
                   <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-200">
-                    {project.summary}
+                    {project.summary[language]}
                   </p>
 
                   <div className="flex flex-wrap gap-2">

@@ -10,12 +10,17 @@ import { PortfolioProfileModel } from "@/models/PortfolioProfile";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+type LocalizedString = {
+  vi: string;
+  en: string;
+};
+
 function serializeProfile(profile: {
   _id: unknown;
   fullName: string;
-  headline: string;
-  location: string;
-  bio: string;
+  headline: LocalizedString;
+  location: LocalizedString;
+  bio: LocalizedString;
   email: string;
   githubUrl?: string;
   linkedinUrl?: string;
@@ -93,10 +98,12 @@ export async function PUT(request: Request) {
       );
     }
 
-    return NextResponse.json(serializeProfile(updatedProfile));
-  } catch {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return NextResponse.json(serializeProfile(updatedProfile as any));
+  } catch (error) {
+    console.error("Profile update error:", error);
     return NextResponse.json(
-      { message: "Khong the cap nhat profile luc nay." },
+      { message: "Khong the cap nhat profile luc nay.", error: error instanceof Error ? error.message : String(error) },
       { status: 500 },
     );
   }

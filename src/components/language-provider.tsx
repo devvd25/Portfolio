@@ -17,6 +17,7 @@ import {
 
 interface LanguageContextValue {
   locale: Locale;
+  language: Locale;
   setLocale: (locale: Locale) => void;
   t: (key: string) => string;
 }
@@ -62,6 +63,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
   const value = useMemo<LanguageContextValue>(
     () => ({
       locale,
+      language: locale,
       setLocale,
       t: (key: string) => translate(locale, key),
     }),

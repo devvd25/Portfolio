@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { parseStackInput } from "@/lib/validators";
-import type { PortfolioProfile, PortfolioProject } from "@/types/portfolio";
+import type { PortfolioProfile, PortfolioProject, LocalizedString } from "@/types/portfolio";
 
 import { AdminExperienceTab } from "./admin-experience-tab";
 import { AdminActivitiesTab } from "./admin-activities-tab";
@@ -29,8 +29,8 @@ interface AdminDashboardProps {
 }
 
 interface ProjectFormState {
-  title: string;
-  summary: string;
+  title: LocalizedString;
+  summary: LocalizedString;
   stackText: string;
   imageUrl: string;
   demoUrl: string;
@@ -39,11 +39,13 @@ interface ProjectFormState {
   order: number;
 }
 
+const emptyLocalizedString: LocalizedString = { vi: "", en: "" };
+
 const emptyProfileState: Omit<PortfolioProfile, "id"> = {
   fullName: "",
-  headline: "",
-  location: "",
-  bio: "",
+  headline: { ...emptyLocalizedString },
+  location: { ...emptyLocalizedString },
+  bio: { ...emptyLocalizedString },
   email: "",
   githubUrl: "",
   linkedinUrl: "",
@@ -52,8 +54,8 @@ const emptyProfileState: Omit<PortfolioProfile, "id"> = {
 };
 
 const emptyProjectState: ProjectFormState = {
-  title: "",
-  summary: "",
+  title: { ...emptyLocalizedString },
+  summary: { ...emptyLocalizedString },
   stackText: "",
   imageUrl: "",
   demoUrl: "",
@@ -64,7 +66,7 @@ const emptyProjectState: ProjectFormState = {
 
 export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const [activeTab, setActiveTab] = useState<
     "projects" | "profile" | "experience" | "activities" | "research"
@@ -151,8 +153,9 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
       });
 
       if (!response.ok) {
-        const payload = (await response.json()) as { message?: string };
-        throw new Error(payload.message ?? t("admin.notice.profileSaveFailed"));
+        const payload = (await response.json()) as { message?: string; error?: string };
+        const errorDetail = payload.error ? ` (${payload.error})` : "";
+        throw new Error((payload.message ?? t("admin.notice.profileSaveFailed")) + errorDetail);
       }
 
       setNotice({
@@ -214,8 +217,9 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
       });
 
       if (!response.ok) {
-        const result = (await response.json()) as { message?: string };
-        throw new Error(result.message ?? t("admin.notice.projectSaveFailed"));
+        const result = (await response.json()) as { message?: string; error?: string };
+        const errorDetail = result.error ? ` (${result.error})` : "";
+        throw new Error((result.message ?? t("admin.notice.projectSaveFailed")) + errorDetail);
       }
 
       setNotice({
@@ -463,14 +467,62 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label={t("admin.projects.field.title")}>
+                <Field label={`${t("admin.projects.field.title")} (VI)`}>
                   <Input
                     required
-                    value={projectForm.title}
+                    value={projectForm.title.vi}
                     onChange={(event) =>
-                      setProjectForm((prev) => ({ ...prev, title: event.target.value }))
+                      setProjectForm((prev) => ({ ...prev, title: { ...prev.title, vi: event.target.value } }))
                     }
-                    placeholder={t("admin.projects.placeholder.title")}
+                    placeholder="Tên dự án bằng tiếng Việt"
+                  />
+                </Field>
+
+                <Field label={`${t("admin.projects.field.title")} (EN)`}>
+                  <Input
+                    required
+                    value={projectForm.title.en}
+                    onChange={(event) =>
+                      setProjectForm((prev) => ({ ...prev, title: { ...prev.title, en: event.target.value } }))
+                    }
+                    placeholder="Project title in English"
+                  />
+                </Field>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label={`${t("admin.projects.field.summary")} (VI)`}>
+                  <Textarea
+                    required
+                    value={projectForm.summary.vi}
+                    onChange={(event) =>
+                      setProjectForm((prev) => ({ ...prev, summary: { ...prev.summary, vi: event.target.value } }))
+                    }
+                    placeholder="Mô tả dự án bằng tiếng Việt"
+                  />
+                </Field>
+
+                <Field label={`${t("admin.projects.field.summary")} (EN)`}>
+                  <Textarea
+                    required
+                    value={projectForm.summary.en}
+                    onChange={(event) =>
+                      setProjectForm((prev) => ({ ...prev, summary: { ...prev.summary, en: event.target.value } }))
+                    }
+                    placeholder="Project summary in English"
+                  />
+                </Field>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label={t("admin.projects.field.stack")}>
+                  <Input
+                    required
+                    value={projectForm.stackText}
+                    onChange={(event) =>
+                      setProjectForm((prev) => ({ ...prev, stackText: event.target.value }))
+                    }
+                    placeholder={t("admin.projects.placeholder.stack")}
                   />
                 </Field>
 
@@ -489,28 +541,6 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
                   />
                 </Field>
               </div>
-
-              <Field label={t("admin.projects.field.summary")}>
-                <Textarea
-                  required
-                  value={projectForm.summary}
-                  onChange={(event) =>
-                    setProjectForm((prev) => ({ ...prev, summary: event.target.value }))
-                  }
-                  placeholder={t("admin.projects.placeholder.summary")}
-                />
-              </Field>
-
-              <Field label={t("admin.projects.field.stack")}>
-                <Input
-                  required
-                  value={projectForm.stackText}
-                  onChange={(event) =>
-                    setProjectForm((prev) => ({ ...prev, stackText: event.target.value }))
-                  }
-                  placeholder={t("admin.projects.placeholder.stack")}
-                />
-              </Field>
 
               <Field label={t("admin.projects.field.imageUrl")}>
                 <Input
@@ -608,10 +638,10 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <h3 className="font-semibold text-zinc-900 dark:text-zinc-50">
-                          {project.order}. {project.title}
+                          {project.order}. {project.title[language]}
                         </h3>
-                        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-                          {project.summary}
+                        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300 line-clamp-2">
+                          {project.summary[language]}
                         </p>
                         <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
                           {project.stack.join(" | ")}
@@ -661,28 +691,6 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
                 />
               </Field>
 
-              <Field label={t("admin.profile.field.headline")}>
-                <Input
-                  required
-                  value={profile.headline}
-                  onChange={(event) =>
-                    setProfile((prev) => ({ ...prev, headline: event.target.value }))
-                  }
-                />
-              </Field>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label={t("admin.profile.field.location")}>
-                <Input
-                  required
-                  value={profile.location}
-                  onChange={(event) =>
-                    setProfile((prev) => ({ ...prev, location: event.target.value }))
-                  }
-                />
-              </Field>
-
               <Field label={t("admin.profile.field.email")}>
                 <Input
                   required
@@ -695,15 +703,71 @@ export function AdminDashboard({ adminEmail }: AdminDashboardProps) {
               </Field>
             </div>
 
-            <Field label={t("admin.profile.field.bio")}>
-              <Textarea
-                required
-                value={profile.bio}
-                onChange={(event) =>
-                  setProfile((prev) => ({ ...prev, bio: event.target.value }))
-                }
-              />
-            </Field>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label={`${t("admin.profile.field.headline")} (VI)`}>
+                <Input
+                  required
+                  value={profile.headline.vi}
+                  onChange={(event) =>
+                    setProfile((prev) => ({ ...prev, headline: { ...prev.headline, vi: event.target.value } }))
+                  }
+                />
+              </Field>
+
+              <Field label={`${t("admin.profile.field.headline")} (EN)`}>
+                <Input
+                  required
+                  value={profile.headline.en}
+                  onChange={(event) =>
+                    setProfile((prev) => ({ ...prev, headline: { ...prev.headline, en: event.target.value } }))
+                  }
+                />
+              </Field>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label={`${t("admin.profile.field.location")} (VI)`}>
+                <Input
+                  required
+                  value={profile.location.vi}
+                  onChange={(event) =>
+                    setProfile((prev) => ({ ...prev, location: { ...prev.location, vi: event.target.value } }))
+                  }
+                />
+              </Field>
+
+              <Field label={`${t("admin.profile.field.location")} (EN)`}>
+                <Input
+                  required
+                  value={profile.location.en}
+                  onChange={(event) =>
+                    setProfile((prev) => ({ ...prev, location: { ...prev.location, en: event.target.value } }))
+                  }
+                />
+              </Field>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label={`${t("admin.profile.field.bio")} (VI)`}>
+                <Textarea
+                  required
+                  value={profile.bio.vi}
+                  onChange={(event) =>
+                    setProfile((prev) => ({ ...prev, bio: { ...prev.bio, vi: event.target.value } }))
+                  }
+                />
+              </Field>
+
+              <Field label={`${t("admin.profile.field.bio")} (EN)`}>
+                <Textarea
+                  required
+                  value={profile.bio.en}
+                  onChange={(event) =>
+                    setProfile((prev) => ({ ...prev, bio: { ...prev.bio, en: event.target.value } }))
+                  }
+                />
+              </Field>
+            </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label={t("admin.profile.field.github")}>

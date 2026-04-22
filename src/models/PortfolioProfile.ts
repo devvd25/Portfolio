@@ -15,19 +15,16 @@ const portfolioProfileSchema = new Schema(
       trim: true,
     },
     headline: {
-      type: String,
-      required: true,
-      trim: true,
+      vi: { type: String, required: true, trim: true },
+      en: { type: String, required: true, trim: true },
     },
     location: {
-      type: String,
-      required: true,
-      trim: true,
+      vi: { type: String, required: true, trim: true },
+      en: { type: String, required: true, trim: true },
     },
     bio: {
-      type: String,
-      required: true,
-      trim: true,
+      vi: { type: String, required: true, trim: true },
+      en: { type: String, required: true, trim: true },
     },
     email: {
       type: String,

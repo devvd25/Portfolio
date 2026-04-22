@@ -10,7 +10,7 @@ interface ResearchSectionProps {
 }
 
 export function ResearchSection({ research }: ResearchSectionProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   if (!research || research.length === 0) return null;
 
@@ -48,11 +48,11 @@ export function ResearchSection({ research }: ResearchSectionProps) {
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-6">
                 <div className="flex-grow">
                   <h3 className="text-2xl font-bold font-display text-foreground mb-3 group-hover:text-primary transition-colors">
-                    {item.title}
+                    {item.title[language]}
                   </h3>
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground mb-4">
                     <span className="font-medium text-primary/80 bg-primary/10 px-3 py-1 rounded-full">
-                      {item.period}
+                      {item.period[language]}
                     </span>
                     <span className="flex items-center gap-2">
                       <UsersIcon className="w-4 h-4" />
@@ -92,7 +92,7 @@ export function ResearchSection({ research }: ResearchSectionProps) {
               <div className="mb-6">
                 <h4 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-2">{t("portfolio.research.abstract")}</h4>
                 <p className="text-foreground leading-relaxed">
-                  {item.abstract}
+                  {item.abstract[language]}
                 </p>
               </div>
 
@@ -105,7 +105,7 @@ export function ResearchSection({ research }: ResearchSectionProps) {
                     {item.achievements.map((ach, i) => (
                       <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
                         <span className="text-primary mt-1">•</span>
-                        <span>{ach}</span>
+                        <span>{ach[language]}</span>
                       </li>
                     ))}
                   </ul>

@@ -1,16 +1,16 @@
 "use client";
 
-import { Plus, Save, Trash2, UploadCloud } from "lucide-react";
+import { Plus, Save, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { useLanguage } from "@/components/language-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import type { PortfolioExperience } from "@/types/portfolio";
+import type { PortfolioExperience, LocalizedString } from "@/types/portfolio";
 
 export function AdminExperienceTab() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [data, setData] = useState<PortfolioExperience[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -19,9 +19,10 @@ export function AdminExperienceTab() {
 
   const emptyForm = {
     company: "",
-    role: "",
-    period: "",
-    tasksText: "",
+    role: { vi: "", en: "" },
+    period: { vi: "", en: "" },
+    tasksTextVI: "",
+    tasksTextEN: "",
     techStackText: "",
     order: 1,
   };
@@ -57,7 +58,37 @@ export function AdminExperienceTab() {
       company: form.company,
       role: form.role,
       period: form.period,
-      tasks: form.tasksText.split("\n").map(t => t.trim()).filter(Boolean),
+      tasks: [
+        ...form.tasksTextVI.split("\n").map(t => t.trim()).filter(Boolean).map(text => ({ vi: text, en: "" })),
+        ...form.tasksTextEN.split("\n").map(t => t.trim()).filter(Boolean).map(text => ({ vi: "", en: text }))
+      ].reduce((acc: LocalizedString[], curr) => {
+          // This is a bit tricky since we want to pair VI and EN tasks if possible.
+          // For now, simpler: user enters VI tasks and EN tasks separately.
+          // BUT wait, tasks should be an array of LocalizedStrings.
+          // Let's assume the user enters them in the same order.
+          return acc;
+      }, []),
+    };
+
+    // Re-thinking payload tasks logic:
+    // User should enter VI and EN tasks line by line. We pair them by index.
+    const viTasks = form.tasksTextVI.split("\n").map(t => t.trim()).filter(Boolean);
+    const enTasks = form.tasksTextEN.split("\n").map(t => t.trim()).filter(Boolean);
+    const maxTasks = Math.max(viTasks.length, enTasks.length);
+    
+    const tasks: LocalizedString[] = [];
+    for (let i = 0; i < maxTasks; i++) {
+      tasks.push({
+        vi: viTasks[i] || "",
+        en: enTasks[i] || ""
+      });
+    }
+
+    const finalPayload = {
+      company: form.company,
+      role: form.role,
+      period: form.period,
+      tasks,
       techStack: form.techStackText.split(",").map(t => t.trim()).filter(Boolean),
       order: Number(form.order),
     };
@@ -68,14 +99,14 @@ export function AdminExperienceTab() {
       const res = await fetch(endpoint, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(finalPayload),
       });
 
       if (!res.ok) throw new Error("Save failed");
 
       setNotice({ type: "success", message: t("admin.common.saveSuccess") });
       setEditingId(null);
-      setForm(emptyForm);
+      setForm({ ...emptyForm, order: data.length + 1 });
       await loadData();
     } catch {
       setNotice({ type: "error", message: t("admin.common.saveFailed") });
@@ -105,7 +136,8 @@ export function AdminExperienceTab() {
       company: item.company,
       role: item.role,
       period: item.period,
-      tasksText: item.tasks.join("\n"),
+      tasksTextVI: item.tasks.map(t => t.vi).join("\n"),
+      tasksTextEN: item.tasks.map(t => t.en).join("\n"),
       techStackText: item.techStack.join(", "),
       order: item.order,
     });
@@ -125,21 +157,47 @@ export function AdminExperienceTab() {
           )}
         </div>
 
-        {notice && <div className="p-3 text-sm rounded bg-amber-100 text-amber-800">{notice.message}</div>}
+        {notice && <div className={`p-3 text-sm rounded ${notice.type === "success" ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}>{notice.message}</div>}
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="text-sm font-semibold">{t("admin.experience.company")} <Input required value={form.company} onChange={e => setForm({ ...form, company: e.target.value })} /></label>
-          <label className="text-sm font-semibold">{t("admin.experience.role")} <Input required value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} /></label>
+          <label className="text-sm font-semibold block">{t("admin.experience.company")} 
+            <Input required value={form.company} onChange={e => setForm({ ...form, company: e.target.value })} />
+          </label>
+          <label className="text-sm font-semibold block">{t("admin.experience.order")} 
+            <Input type="number" required value={form.order} onChange={e => setForm({ ...form, order: Number(e.target.value) })} />
+          </label>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="text-sm font-semibold">{t("admin.experience.period")} <Input required value={form.period} onChange={e => setForm({ ...form, period: e.target.value })} /></label>
-          <label className="text-sm font-semibold">{t("admin.experience.order")} <Input type="number" required value={form.order} onChange={e => setForm({ ...form, order: Number(e.target.value) })} /></label>
+          <label className="text-sm font-semibold block">{t("admin.experience.role")} (VI)
+            <Input required value={form.role.vi} onChange={e => setForm({ ...form, role: { ...form.role, vi: e.target.value } })} />
+          </label>
+          <label className="text-sm font-semibold block">{t("admin.experience.role")} (EN)
+            <Input required value={form.role.en} onChange={e => setForm({ ...form, role: { ...form.role, en: e.target.value } })} />
+          </label>
         </div>
 
-        <label className="text-sm font-semibold block">{t("admin.experience.techStack")} <Input required value={form.techStackText} onChange={e => setForm({ ...form, techStackText: e.target.value })} /></label>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="text-sm font-semibold block">{t("admin.experience.period")} (VI)
+            <Input required value={form.period.vi} onChange={e => setForm({ ...form, period: { ...form.period, vi: e.target.value } })} />
+          </label>
+          <label className="text-sm font-semibold block">{t("admin.experience.period")} (EN)
+            <Input required value={form.period.en} onChange={e => setForm({ ...form, period: { ...form.period, en: e.target.value } })} />
+          </label>
+        </div>
+
+        <label className="text-sm font-semibold block">{t("admin.experience.techStack")} 
+          <Input required value={form.techStackText} onChange={e => setForm({ ...form, techStackText: e.target.value })} placeholder="React, Next.js, Node.js..." />
+        </label>
         
-        <label className="text-sm font-semibold block">{t("admin.experience.tasks")} <Textarea required rows={4} value={form.tasksText} onChange={e => setForm({ ...form, tasksText: e.target.value })} /></label>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="text-sm font-semibold block">{t("admin.experience.tasks")} (VI)
+            <Textarea required rows={4} value={form.tasksTextVI} onChange={e => setForm({ ...form, tasksTextVI: e.target.value })} placeholder="Mỗi dòng một nhiệm vụ" />
+          </label>
+          <label className="text-sm font-semibold block">{t("admin.experience.tasks")} (EN)
+            <Textarea required rows={4} value={form.tasksTextEN} onChange={e => setForm({ ...form, tasksTextEN: e.target.value })} placeholder="One task per line" />
+          </label>
+        </div>
 
         <Button type="submit" disabled={isSaving} className="w-full">
           {editingId ? <Save className="h-4 w-4 mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
@@ -153,8 +211,8 @@ export function AdminExperienceTab() {
           {sortedData.map(item => (
             <article key={item.id} className="rounded-2xl border border-zinc-200 bg-white/80 p-4 dark:border-zinc-700 dark:bg-zinc-900/70 flex justify-between">
               <div>
-                <h3 className="font-semibold">{item.role} @ {item.company}</h3>
-                <p className="text-xs text-muted-foreground">{item.period}</p>
+                <h3 className="font-semibold">{item.role[language]} @ {item.company}</h3>
+                <p className="text-xs text-muted-foreground">{item.period[language]}</p>
               </div>
               <div className="flex gap-2">
                 <Button size="sm" variant="outline" onClick={() => handleEdit(item)}>{t("admin.common.edit")}</Button>

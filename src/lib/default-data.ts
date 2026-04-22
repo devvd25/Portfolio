@@ -12,9 +12,18 @@ export const FALLBACK_AVATAR_URL =
 
 export const defaultProfileSeed: Omit<PortfolioProfile, "id"> = {
   fullName: "Nguyen Minh Anh",
-  headline: "Full-stack Developer crafting thoughtful digital products",
-  location: "Ho Chi Minh City, Viet Nam",
-  bio: "I build fast, elegant products with a strong focus on user experience, maintainable architecture, and real business impact. My sweet spot is shipping modern web apps from concept to production.",
+  headline: {
+    vi: "Lập trình viên Full-stack tạo ra các sản phẩm kỹ thuật số ý nghĩa",
+    en: "Full-stack Developer crafting thoughtful digital products",
+  },
+  location: {
+    vi: "Thành phố Hồ Chí Minh, Việt Nam",
+    en: "Ho Chi Minh City, Viet Nam",
+  },
+  bio: {
+    vi: "Tôi xây dựng các sản phẩm nhanh, thanh lịch với sự tập trung mạnh mẽ vào trải nghiệm người dùng, kiến trúc dễ bảo trì và tác động thực tế đến kinh doanh. Thế mạnh của tôi là đưa các ứng dụng web hiện đại từ ý tưởng đến thực tế.",
+    en: "I build fast, elegant products with a strong focus on user experience, maintainable architecture, and real business impact. My sweet spot is shipping modern web apps from concept to production.",
+  },
   email: "hello@minhanh.dev",
   githubUrl: "https://github.com",
   linkedinUrl: "https://linkedin.com",
@@ -24,9 +33,14 @@ export const defaultProfileSeed: Omit<PortfolioProfile, "id"> = {
 
 export const defaultProjectsSeed: Array<Omit<PortfolioProject, "id">> = [
   {
-    title: "PetSphere Studio",
-    summary:
-      "A premium booking platform for pet services with an expressive clay-inspired interface, role-based dashboards, and payment integration.",
+    title: {
+      vi: "PetSphere Studio",
+      en: "PetSphere Studio",
+    },
+    summary: {
+      vi: "Một nền tảng đặt chỗ cao cấp cho các dịch vụ thú cưng với giao diện lấy cảm hứng từ đất sét, bảng điều khiển phân quyền và tích hợp thanh toán.",
+      en: "A premium booking platform for pet services with an expressive clay-inspired interface, role-based dashboards, and payment integration.",
+    },
     stack: ["Next.js", "TypeScript", "Tailwind", "MongoDB"],
     imageUrl:
       "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=80",
@@ -36,9 +50,14 @@ export const defaultProjectsSeed: Array<Omit<PortfolioProject, "id">> = [
     order: 1,
   },
   {
-    title: "InsightBoard Analytics",
-    summary:
-      "A real-time team dashboard for product and growth metrics, combining streaming data, collaborative notes, and custom report builders.",
+    title: {
+      vi: "InsightBoard Analytics",
+      en: "InsightBoard Analytics",
+    },
+    summary: {
+      vi: "Bảng điều khiển nhóm thời gian thực cho các chỉ số sản phẩm và tăng trưởng, kết hợp dữ liệu trực tiếp, ghi chú cộng tác và trình tạo báo cáo tùy chỉnh.",
+      en: "A real-time team dashboard for product and growth metrics, combining streaming data, collaborative notes, and custom report builders.",
+    },
     stack: ["Next.js", "Node.js", "Socket.IO", "MongoDB"],
     imageUrl:
       "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80",
@@ -48,9 +67,14 @@ export const defaultProjectsSeed: Array<Omit<PortfolioProject, "id">> = [
     order: 2,
   },
   {
-    title: "Orbit Commerce",
-    summary:
-      "An ecommerce experience with personalized recommendations, robust admin tools, and conversion-first checkout journeys.",
+    title: {
+      vi: "Orbit Commerce",
+      en: "Orbit Commerce",
+    },
+    summary: {
+      vi: "Trải nghiệm thương mại điện tử với đề xuất cá nhân hóa, công cụ quản trị mạnh mẽ và quy trình thanh toán tối ưu chuyển đổi.",
+      en: "An ecommerce experience with personalized recommendations, robust admin tools, and conversion-first checkout journeys.",
+    },
     stack: ["React", "Tailwind", "Node.js", "MongoDB"],
     imageUrl:
       "https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1200&q=80",
@@ -63,8 +87,14 @@ export const defaultProjectsSeed: Array<Omit<PortfolioProject, "id">> = [
 
 export const defaultSkills: SkillCategory[] = [
   {
-    title: "Frontend Craft",
-    description: "Interactive interfaces with performance-first architecture.",
+    title: {
+      vi: "Kỹ thuật Frontend",
+      en: "Frontend Craft",
+    },
+    description: {
+      vi: "Giao diện tương tác với kiến trúc ưu tiên hiệu suất.",
+      en: "Interactive interfaces with performance-first architecture.",
+    },
     items: [
       "Next.js App Router",
       "React 19",
@@ -74,13 +104,25 @@ export const defaultSkills: SkillCategory[] = [
     ],
   },
   {
-    title: "Backend Engineering",
-    description: "Secure APIs and scalable service design.",
+    title: {
+      vi: "Kỹ thuật Backend",
+      en: "Backend Engineering",
+    },
+    description: {
+      vi: "API an toàn và thiết kế dịch vụ có khả năng mở rộng.",
+      en: "Secure APIs and scalable service design.",
+    },
     items: ["Node.js", "REST APIs", "Auth", "Caching", "Validation"],
   },
   {
-    title: "Data and DevOps",
-    description: "Reliable delivery pipelines and cloud-ready deployment.",
+    title: {
+      vi: "Dữ liệu & DevOps",
+      en: "Data and DevOps",
+    },
+    description: {
+      vi: "Luồng triển khai đáng tin cậy và vận hành trên đám mây.",
+      en: "Reliable deployment pipelines and cloud operations.",
+    },
     items: ["MongoDB", "Mongoose", "Vercel", "CI/CD", "Monitoring"],
   },
 ];
@@ -88,13 +130,31 @@ export const defaultSkills: SkillCategory[] = [
 export const defaultExperienceSeed: Array<Omit<PortfolioExperience, "id">> = [
   {
     company: "Ikigai Company",
-    role: "Full-stack Developer",
-    period: "2024 — 2025",
+    role: {
+      vi: "Lập trình viên Full-stack",
+      en: "Full-stack Developer",
+    },
+    period: {
+      vi: "2024 — 2025",
+      en: "2024 — 2025",
+    },
     tasks: [
-      "Xây dựng và phát triển các tính năng cốt lõi cho nền tảng của công ty.",
-      "Tối ưu hóa hiệu suất ứng dụng và cải thiện UX/UI.",
-      "Làm việc trực tiếp với khách hàng để lấy yêu cầu và thiết kế giải pháp.",
-      "Quản lý database và deployment server."
+      {
+        vi: "Xây dựng và phát triển các tính năng cốt lõi cho nền tảng của công ty.",
+        en: "Build and develop core features for the company platform.",
+      },
+      {
+        vi: "Tối ưu hóa hiệu suất ứng dụng và cải thiện UX/UI.",
+        en: "Optimize application performance and improve UX/UI.",
+      },
+      {
+        vi: "Làm việc trực tiếp với khách hàng để lấy yêu cầu và thiết kế giải pháp.",
+        en: "Work directly with clients to gather requirements and design solutions.",
+      },
+      {
+        vi: "Quản lý database và deployment server.",
+        en: "Manage database and deployment servers.",
+      }
     ],
     techStack: ["React", "Node.js", "MongoDB", "TailwindCSS"],
     companyImageUrl: "/activities/ikigai-company.jpg",
@@ -105,22 +165,40 @@ export const defaultExperienceSeed: Array<Omit<PortfolioExperience, "id">> = [
 
 export const defaultActivitiesSeed: Array<Omit<PortfolioActivity, "id">> = [
   {
-    title: "Tình nguyện làm sạch biển",
-    description: "Tham gia cùng cộng đồng làm sạch bãi biển địa phương.",
+    title: {
+      vi: "Tình nguyện làm sạch biển",
+      en: "Beach Cleanup Volunteer",
+    },
+    description: {
+      vi: "Tham gia cùng cộng đồng làm sạch bãi biển địa phương.",
+      en: "Join the community to clean up local beaches.",
+    },
     imageUrl: "/activities/beach-cleanup.png",
     category: "community",
     order: 1,
   },
   {
-    title: "Tham quan bảo tàng",
-    description: "Khám phá lịch sử và văn hóa nghệ thuật.",
+    title: {
+      vi: "Tham quan bảo tàng",
+      en: "Museum Visit",
+    },
+    description: {
+      vi: "Khám phá lịch sử và văn hóa nghệ thuật.",
+      en: "Explore art history and culture.",
+    },
     imageUrl: "/activities/museum-visit.png",
     category: "community",
     order: 2,
   },
   {
-    title: "Workshop Chuyển đổi số",
-    description: "Chia sẻ về ứng dụng AI trong doanh nghiệp.",
+    title: {
+      vi: "Workshop Chuyển đổi số",
+      en: "Digital Transformation Workshop",
+    },
+    description: {
+      vi: "Chia sẻ về ứng dụng AI trong doanh nghiệp.",
+      en: "Share about AI applications in business.",
+    },
     imageUrl: "/activities/digital-transformation.png",
     category: "workshop",
     order: 1,
@@ -129,15 +207,33 @@ export const defaultActivitiesSeed: Array<Omit<PortfolioActivity, "id">> = [
 
 export const defaultResearchSeed: Array<Omit<PortfolioResearch, "id">> = [
   {
-    title: "Flower Classification Using EfficientNetB0 with Grad-CAM Explainability",
-    period: "02/2026 — 04/2026",
+    title: {
+      vi: "Phân loại hoa sử dụng EfficientNetB0 với giải thích Grad-CAM",
+      en: "Flower Classification Using EfficientNetB0 with Grad-CAM Explainability",
+    },
+    period: {
+      vi: "02/2026 — 04/2026",
+      en: "02/2026 — 04/2026",
+    },
     authors: ["Rmah Viu", "Nguyễn Thanh Phước", "Phan Thanh Huy"],
-    abstract: "Nghiên cứu ứng dụng mô hình Deep Learning (EfficientNetB0) vào việc phân loại các loài hoa, kết hợp với Grad-CAM để giải thích dự đoán của mô hình bằng bản đồ nhiệt (heatmap).",
+    abstract: {
+      vi: "Nghiên cứu ứng dụng mô hình Deep Learning (EfficientNetB0) vào việc phân loại các loài hoa, kết hợp với Grad-CAM để giải thích dự đoán của mô hình bằng bản đồ nhiệt (heatmap).",
+      en: "Research applying Deep Learning model (EfficientNetB0) to classify flower species, combined with Grad-CAM to explain model predictions using heatmaps.",
+    },
     technologies: ["EfficientNetB0", "Transfer Learning", "Grad-CAM", "Python"],
     achievements: [
-      "Đạt độ chính xác 98.5% trên tập test",
-      "Triển khai thành công web app demo bằng Gradio",
-      "Giải thích được vùng đặc trưng ảnh hưởng tới dự đoán"
+      {
+        vi: "Đạt độ chính xác 98.5% trên tập test",
+        en: "Achieved 98.5% accuracy on the test set",
+      },
+      {
+        vi: "Triển khai thành công web app demo bằng Gradio",
+        en: "Successfully deployed web app demo using Gradio",
+      },
+      {
+        vi: "Giải thích được vùng đặc trưng ảnh hưởng tới dự đoán",
+        en: "Explained feature regions affecting predictions",
+      }
     ],
     demoUrl: "https://huggingface.co/spaces/viugialai/Flower-Recognition-Using-Deep-Learning",
     documentUrl: "https://v0-portfolio-viu.vercel.app/ICT2026-Flower-Classification-Research.docx",
